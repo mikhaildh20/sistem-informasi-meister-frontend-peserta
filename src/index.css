@@ -106,3 +106,48 @@ dialog::backdrop {
     display: initial;
   }
 }
+
+.custom-navbar {
+  background: linear-gradient(to bottom, white, rgb(219, 219, 219)); /* Vertical gradient */
+}
+
+.navbar-brand img {
+  width: 150px; /* Default size for larger screens */
+}
+
+@media (max-width: 1024px) { /* Tablets and smaller devices */
+  .navbar-brand img {
+    width: 100px; /* Adjusts for smaller screens */
+  }
+}
+
+@media (max-width: 768px) { /* Smartphones */
+  .navbar-brand img {
+    width: 80px; /* Further reduced for very small screens */
+  }
+}
+
+.custom-container {
+  width: 95%; /* Default width */
+  margin: 0 auto; /* Centering */
+  padding: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .custom-container {
+    width: 98%; /* Slightly wider for tablets */
+  }
+}
+
+@media (max-width: 768px) {
+  .custom-container {
+    width: 100%; /* Full width for mobile */
+    padding: 15px;
+  }
+}
+
+
+.add-title{
+  color: #0A5EA8;
+}
