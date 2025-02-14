@@ -266,7 +266,7 @@ const Add = () => {
             <div className="card mt-3">
                 <div className="card-header"><h2 className="add-title">Formulir Pendaftaran</h2></div>
                 <div className="card-body">
-                    <form action=""> 
+                    <form onSubmit=""> 
                     <div className="card">
                     <div className="card-header"><h5>Data Pribadi</h5></div>
                         <div className="card-body">
@@ -307,6 +307,7 @@ const Add = () => {
                                                     label="Nama Peserta"
                                                     type="text"
                                                     placeholder="Masukkan Nama Peserta"
+                                                    value={formDataRef.current.pes_nama}
                                                     isRequired
                                                 />
                                             </div>
@@ -315,6 +316,7 @@ const Add = () => {
                                                 <Dropdown
                                                     label="Program Meister"
                                                     arrData={listProgramMeister}
+                                                    value={formDataRef.current.pro_id}
                                                     isRequired
                                                 />
                                             </div>
@@ -328,6 +330,7 @@ const Add = () => {
                                                     label="Tempat Lahir"
                                                     type="text"
                                                     placeholder="Masukkan Tempat Lahir"
+                                                    value={formDataRef.current.pes_tempat_lahir}
                                                     isRequired
                                                 />
                                             </div>
@@ -336,6 +339,7 @@ const Add = () => {
                                                 <Input
                                                     label="Tanggal Lahir"
                                                     type="date"
+                                                    value={formDataRef.current.pes_tanggal_lahir}
                                                     isRequired
                                                 />
                                             </div>
@@ -349,6 +353,7 @@ const Add = () => {
                                                     label="Angkatan"
                                                     type="text"
                                                     placeholder="Masukkan Angkatan (20xx)"
+                                                    value={formDataRef.current.pes_angkatan}
                                                     isRequired
                                                 />
                                             </div>
@@ -357,6 +362,7 @@ const Add = () => {
                                                 <Dropdown
                                                     label="Jenis Kelamin"
                                                     arrData={listJenisKelamin}
+                                                    value={formDataRef.current.pes_jenis_kelamin}
                                                     isRequired
                                                 />
                                             </div>
@@ -370,6 +376,7 @@ const Add = () => {
                                                     label="Alamat"
                                                     type="text"
                                                     placeholder="Masukkan Alamat"
+                                                    value={formDataRef.current.pes_alamat}
                                                     isRequired
                                                 />
                                             </div>
@@ -379,6 +386,7 @@ const Add = () => {
                                                     label="Kode Pos"
                                                     type="text"
                                                     placeholder="Masukkan Kode Pos"
+                                                    value={formDataRef.current.pes_kodepos}
                                                     isRequired
                                                 />
                                             </div>
@@ -392,6 +400,7 @@ const Add = () => {
                                                     label="Email"
                                                     type="email"
                                                     placeholder="Masukkan Email"
+                                                    value={formDataRef.current.pes_email}
                                                     isRequired
                                                 />
                                             </div>
@@ -401,6 +410,7 @@ const Add = () => {
                                                     label="Nomor HP"
                                                     type="text"
                                                     placeholder="Masukkan Nomor HP"
+                                                    value={formDataRef.current.pes_hp}
                                                     isRequired
                                                 />
                                             </div>
@@ -413,6 +423,7 @@ const Add = () => {
                                                 <Dropdown
                                                     label="Golongan Darah"
                                                     arrData={listGolonganDarah}
+                                                    value={formDataRef.current.pes_golongan_darah}
                                                     isRequired
                                                 />
                                             </div>
@@ -421,6 +432,7 @@ const Add = () => {
                                                 <Dropdown
                                                     label="Kewarganegaraan"
                                                     arrData={listKewarganegaraan}
+                                                    value={formDataRef.current.pes_kewarganegaraan}
                                                     isRequired
                                                 />
                                             </div>
@@ -433,6 +445,7 @@ const Add = () => {
                                                 <Dropdown
                                                     label="Agama"
                                                     arrData={listAgama}
+                                                    value={formDataRef.current.pes_agama}
                                                     isRequired
                                                 />
                                             </div>
@@ -441,6 +454,7 @@ const Add = () => {
                                                 <Dropdown
                                                     label="Status Perkawinan"
                                                     arrData={listStatusPerkawinan}
+                                                    value={formDataRef.current.pes_status_perkawinan}
                                                     isRequired
                                                 />
                                             </div>
@@ -460,6 +474,7 @@ const Add = () => {
                                                     label="Email Perusahaan"
                                                     type="text"
                                                     placeholder="Masukkan Email Perusahaan"
+                                                    value={formDataRef.current.pes_email_perusahaan}
                                                     isRequired
                                                 />
                                             </div>
@@ -469,6 +484,7 @@ const Add = () => {
                                                     label="Alamat Perusahaan"
                                                     type="text"
                                                     placeholder="Masukkan Alamat Perusahaan"
+                                                    value={formDataRef.current.pes_alamat_perusahaan}
                                                     isRequired
                                                 />
                                             </div>
@@ -478,6 +494,7 @@ const Add = () => {
                                                     label="Kode Pos Perusahaan"
                                                     placeholder="Masukkan Kode Pos Perusahaan"
                                                     type="text"
+                                                    value={formDataRef.current.pes_kodepos_perusahaan}
                                                     isRequired
                                                 />
                                             </div>
@@ -495,6 +512,7 @@ const Add = () => {
                                                     label="Telepon Perusahaan"
                                                     placeholder="Masukkan Telepon Perusahaan"
                                                     type="text"
+                                                    value={formDataRef.current.pes_hp_perusahaan}
                                                     isRequired
                                                 />
                                             </div>
@@ -504,6 +522,7 @@ const Add = () => {
                                                     label="Ukuran Sepatu"
                                                     placeholder="Masukkan Ukuran Sepatu (xx)"
                                                     type="text"
+                                                    value={formDataRef.current.pes_ukuran_sepatu}
                                                     isRequired
                                                 />
                                             </div>
@@ -512,6 +531,7 @@ const Add = () => {
                                                 <Dropdown
                                                     label="Ukuran Kemeja"
                                                     arrData={listUkuranBaju}
+                                                    value={formDataRef.current.pes_ukuran_kemeja}
                                                     isRequired
                                                 />
                                             </div>
@@ -529,6 +549,7 @@ const Add = () => {
                                                     label="Kontak Darurat"
                                                     type="text"
                                                     placeholder="Masukkan Kontak Darurat (08xxxxx)"
+                                                    value={formDataRef.current.pes_no_darurat}
                                                     isRequired
                                                 />
                                             </div>
@@ -538,6 +559,7 @@ const Add = () => {
                                                     label="Nama Kontak Darurat"
                                                     type="text"
                                                     placeholder="Masukkan Nama Kontak"
+                                                    value={formDataRef.current.pes_nama_darurat}
                                                     isRequired
                                                 />
                                             </div>
@@ -546,6 +568,7 @@ const Add = () => {
                                                 <Input
                                                     label="Hubungan Kontak Darurat"
                                                     placeholder="Masukkan Hubungan Kontak"
+                                                    value={formDataRef.current.pes_hubungan_darurat}
                                                     type="text"
                                                     isRequired
                                                 />
@@ -563,6 +586,7 @@ const Add = () => {
                                                 <Input
                                                     label="Media Sosial"
                                                     placeholder="Masukkan Media Sosial"
+                                                    value={formDataRef.current.pes_media_sosial}
                                                     type="text"
                                                 />
                                             </div>
@@ -571,6 +595,7 @@ const Add = () => {
                                                 <Input
                                                     label="Kursus"
                                                     placeholder="Masukkan Kursus"
+                                                    value={formDataRef.current.pes_kursus}
                                                     type="text"
                                                 />
                                             </div>
@@ -579,6 +604,7 @@ const Add = () => {
                                                 <Input
                                                     label="Hobi"
                                                     placeholder="Masukkan Hobi"
+                                                    value={formDataRef.current.pes_hobi}
                                                     type="text"
                                                 />
                                             </div>
@@ -598,6 +624,7 @@ const Add = () => {
                                         <Dropdown
                                             label="Pendidikan Terakhir"
                                             arrData={listPendidikanTerakhir}
+                                            value={formDataRef.current.pes_pendidikan_terakhir}
                                             isRequired
                                         />
                                     </div>
@@ -607,6 +634,7 @@ const Add = () => {
                                             label="Nama Sekolah"
                                             type="text"
                                             placeholder="Masukkan Nama Sekolah"
+                                            value={formDataRef.current.pes_nama_sekolah}
                                             isRequired
                                         />
                                     </div>
@@ -615,6 +643,7 @@ const Add = () => {
                                         <Input
                                             label="Tahun Lulus Sekolah"
                                             placeholder="Masukkan Tahun Lulus Sekolah"
+                                            value={formDataRef.current.pes_tahun_lulus_sekolah}
                                             type="text"
                                             isRequired
                                         />
@@ -874,14 +903,14 @@ const Add = () => {
                                         <div className="row">
                                     <div className="col-md-6">
                                         <div className="d-flex align-items-center gap-2">
-                                        <input type="radio" className="form-check-input" name="checkAlamat" value="Rumah" />
-                                        <label className="form-check-label">Rumah</label>
+                                            <input type="radio" className="form-check-input" name="checkAlamat" value="Rumah" />
+                                            <label className="form-check-label">Rumah</label>
                                         </div>
                                     </div>
                                     <div className="col-md-6">
                                         <div className="d-flex align-items-center gap-2">
-                                        <input type="radio" className="form-check-input" name="checkAlamat" value="Kantor" />
-                                        <label className="form-check-label">Kantor</label>
+                                            <input type="radio" className="form-check-input" name="checkAlamat" value="Kantor" />
+                                            <label className="form-check-label">Kantor</label>
                                         </div>
                                         </div>
                                     </div>
@@ -902,10 +931,11 @@ const Add = () => {
                             </div>
                         </div>
 
-                        <Button
+                            <Button
                                     classType="primary float-end mt-3"
                                     label="Daftar"
                                     iconName="add"
+                                    type="submit"
                                     // onClick={() => onChangePage("index")}
                                 />
                     </form>
