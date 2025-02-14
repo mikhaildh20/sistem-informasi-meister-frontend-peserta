@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import blank from "../../../assets/blankPicture.png";
 import Alert from "../../part/Alert";
 import Dropdown from "../../part/Dropdown";
@@ -16,9 +16,9 @@ const listJenisKelamin = [
 ];
 
 const listProgramMeister = [
-    {Value: "Meister Otomotif", Text: "Meister Otomotif"},
-    {Value: "Malaysian Meister Program", Text: "Malaysian Meister Program"},
-    {Value: "Advanced Technology Meister Programme (ATMP)", Text: "Advanced Technology Meister Programme (ATMP)"},
+    {Value: "1", Text: "Meister Otomotif"},
+    {Value: "2", Text: "Malaysian Meister Program"},
+    {Value: "3", Text: "Advanced Technology Meister Programme (ATMP)"},
 ];
 
 const listGolonganDarah = [
@@ -75,6 +75,87 @@ const Add = () => {
         periodeMulai: '',
         periodeAkhir: '',
     });
+
+    const formDataRef = useRef({
+        kel_id: "-",
+        kur_id: "-",
+        pes_nama: "",
+        pro_id: "",
+        pes_tempat_lahir: "",
+        pes_tanggal_lahir: "",
+        pes_angkatan: "",
+        pes_jenis_kelamin: "",
+        pes_alamat: "",
+        pes_kodepos: "",
+        pes_email: "",
+        pes_hp: "",
+        pes_golongan_darah: "",
+        pes_kewarganegaraan: "",
+        pes_agama: "",
+        pes_status_perkawinan: "",
+        pes_email_perusahaan: "",
+        pes_alamat_perusahaan: "",
+        pes_kodepos_perusahaan: "",
+        pes_hp_perusahaan: "",
+        pes_ukuran_sepatu: "",
+        pes_ukuran_kemeja: "",
+        pes_no_darurat: "",
+        pes_nama_darurat: "",
+        pes_hubungan_darurat: "",
+        pes_media_sosial: "",
+        pes_kursus: "",
+        pes_hobi: "",
+        pes_pendidikan_terakhir: "",
+        pes_nama_sekolah: "",
+        pes_tahun_lulus_sekolah: "",
+        pes_perguruan_tinggi: "",
+        pes_tahun_lulus_perguruan: "",
+        pes_ijazah: "",
+        pes_ktp: "",
+        pes_sertifikat: "",
+        pes_tujuan_kirim: "",
+        pes_created_by: "aurelio.ramadhan",
+    });
+
+    // const userSchema = object({
+    //     pes_nama: string()
+    //         .max(100, "maksimum 100 karakter")
+    //         .required("harus diisi!"),
+    //     pro_id: string().required("harus diisi!"),
+    //     pes_tempat_lahir: string().required("harus diisi!"),
+    //     pes_tanggal_lahir: string().required("harus diisi!"),
+    //     pes_angkatan: string().required("harus diisi!"),
+    //     pes_jenis_kelamin: string().required("harus diisi!"),
+    //     pes_alamat: string().required("harus diisi!"),
+    //     pes_kodepos: string().required("harus diisi!"),
+    //     pes_email: string().required("harus diisi!"),
+    //     pes_hp: string().required("harus diisi!"),
+    //     pes_golongan_darah: string().required("harus diisi!"),
+    //     pes_kewarganegaraan: string().required("harus diisi!"),
+    //     pes_agama: string().required("harus diisi!"),
+    //     pes_status_perkawinan: string().required("harus diisi!"),
+    //     pes_email_perusahaan: string(),
+    //     pes_alamat_perusahaan: string(),
+    //     pes_kodepos_perusahaan: string(),
+    //     pes_hp_perusahaan: string(),
+    //     pes_ukuran_sepatu: string().required("harus diisi!"),
+    //     pes_ukuran_kemeja: string().required("harus diisi!"),
+    //     pes_no_darurat: string(),
+    //     pes_nama_darurat: string(),
+    //     pes_hubungan_darurat: string(),
+    //     pes_media_sosial: string(),
+    //     pes_kursus: string(),
+    //     pes_hobi: string(),
+    //     pes_pendidikan_terakhir: string().required("harus diisi!"),
+    //     pes_nama_sekolah: string().required("harus diisi!"),
+    //     pes_tahun_lulus_sekolah: string().required("harus diisi!"),
+    //     pes_perguruan_tinggi: string(),
+    //     pes_tahun_lulus_perguruan: string(),
+    //     pes_ijazah: string().required("harus diisi!"),
+    //     pes_ktp: string().required("harus diisi!"),
+    //     pes_sertifikat: string(),
+    //     pes_tujuan_kirim: string().required("harus diisi!"),
+    // });
 
     const [records, setRecords] = useState([]);
 
@@ -225,6 +306,7 @@ const Add = () => {
                                                 <Input
                                                     label="Nama Peserta"
                                                     type="text"
+                                                    placeholder="Masukkan Nama Peserta"
                                                     isRequired
                                                 />
                                             </div>
@@ -245,6 +327,7 @@ const Add = () => {
                                                 <Input
                                                     label="Tempat Lahir"
                                                     type="text"
+                                                    placeholder="Masukkan Tempat Lahir"
                                                     isRequired
                                                 />
                                             </div>
@@ -265,6 +348,7 @@ const Add = () => {
                                                 <Input
                                                     label="Angkatan"
                                                     type="text"
+                                                    placeholder="Masukkan Angkatan (20xx)"
                                                     isRequired
                                                 />
                                             </div>
@@ -285,6 +369,7 @@ const Add = () => {
                                                 <Input
                                                     label="Alamat"
                                                     type="text"
+                                                    placeholder="Masukkan Alamat"
                                                     isRequired
                                                 />
                                             </div>
@@ -293,6 +378,7 @@ const Add = () => {
                                                 <Input
                                                     label="Kode Pos"
                                                     type="text"
+                                                    placeholder="Masukkan Kode Pos"
                                                     isRequired
                                                 />
                                             </div>
@@ -305,6 +391,7 @@ const Add = () => {
                                                 <Input
                                                     label="Email"
                                                     type="email"
+                                                    placeholder="Masukkan Email"
                                                     isRequired
                                                 />
                                             </div>
@@ -313,6 +400,7 @@ const Add = () => {
                                                 <Input
                                                     label="Nomor HP"
                                                     type="text"
+                                                    placeholder="Masukkan Nomor HP"
                                                     isRequired
                                                 />
                                             </div>
@@ -371,6 +459,7 @@ const Add = () => {
                                                 <Input
                                                     label="Email Perusahaan"
                                                     type="text"
+                                                    placeholder="Masukkan Email Perusahaan"
                                                     isRequired
                                                 />
                                             </div>
@@ -379,6 +468,7 @@ const Add = () => {
                                                 <Input
                                                     label="Alamat Perusahaan"
                                                     type="text"
+                                                    placeholder="Masukkan Alamat Perusahaan"
                                                     isRequired
                                                 />
                                             </div>
@@ -386,6 +476,7 @@ const Add = () => {
                                             <div className="col-md-4">
                                                 <Input
                                                     label="Kode Pos Perusahaan"
+                                                    placeholder="Masukkan Kode Pos Perusahaan"
                                                     type="text"
                                                     isRequired
                                                 />
@@ -402,6 +493,7 @@ const Add = () => {
                                             <div className="col-md-4">
                                                 <Input
                                                     label="Telepon Perusahaan"
+                                                    placeholder="Masukkan Telepon Perusahaan"
                                                     type="text"
                                                     isRequired
                                                 />
@@ -410,6 +502,7 @@ const Add = () => {
                                             <div className="col-md-4">
                                                 <Input
                                                     label="Ukuran Sepatu"
+                                                    placeholder="Masukkan Ukuran Sepatu (xx)"
                                                     type="text"
                                                     isRequired
                                                 />
@@ -435,6 +528,7 @@ const Add = () => {
                                                 <Input
                                                     label="Kontak Darurat"
                                                     type="text"
+                                                    placeholder="Masukkan Kontak Darurat (08xxxxx)"
                                                     isRequired
                                                 />
                                             </div>
@@ -443,6 +537,7 @@ const Add = () => {
                                                 <Input
                                                     label="Nama Kontak Darurat"
                                                     type="text"
+                                                    placeholder="Masukkan Nama Kontak"
                                                     isRequired
                                                 />
                                             </div>
@@ -450,6 +545,7 @@ const Add = () => {
                                             <div className="col-md-4">
                                                 <Input
                                                     label="Hubungan Kontak Darurat"
+                                                    placeholder="Masukkan Hubungan Kontak"
                                                     type="text"
                                                     isRequired
                                                 />
@@ -466,6 +562,7 @@ const Add = () => {
                                             <div className="col-md-4">
                                                 <Input
                                                     label="Media Sosial"
+                                                    placeholder="Masukkan Media Sosial"
                                                     type="text"
                                                 />
                                             </div>
@@ -473,6 +570,7 @@ const Add = () => {
                                             <div className="col-md-4">
                                                 <Input
                                                     label="Kursus"
+                                                    placeholder="Masukkan Kursus"
                                                     type="text"
                                                 />
                                             </div>
@@ -480,6 +578,7 @@ const Add = () => {
                                             <div className="col-md-4">
                                                 <Input
                                                     label="Hobi"
+                                                    placeholder="Masukkan Hobi"
                                                     type="text"
                                                 />
                                             </div>
@@ -507,6 +606,7 @@ const Add = () => {
                                         <Input
                                             label="Nama Sekolah"
                                             type="text"
+                                            placeholder="Masukkan Nama Sekolah"
                                             isRequired
                                         />
                                     </div>
@@ -514,6 +614,7 @@ const Add = () => {
                                     <div className="col-md-4">
                                         <Input
                                             label="Tahun Lulus Sekolah"
+                                            placeholder="Masukkan Tahun Lulus Sekolah"
                                             type="text"
                                             isRequired
                                         />
@@ -522,16 +623,18 @@ const Add = () => {
 
 
                                 <div className="row">
-                                    <div className="col-md-6">
+                                    <div className="col-md-4">
                                         <Input
                                             label="Nama Perguruan Tinggi"
+                                            placeholder="Masukkan Nama Perguruan Tinggi"
                                             type="text"
                                         />
                                     </div>
 
-                                    <div className="col-md-6">
+                                    <div className="col-md-4">
                                         <Input
                                             label="Tahun Lulus Perguruan Tinggi"
+                                            placeholder="Masukkan Tahun Lulus Perguruan Tinggi"
                                             type="text"
                                         />
                                     </div>
@@ -651,22 +754,30 @@ const Add = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {records.map((record, index) => (
-                                        <tr key={record.id}>
-                                            <td>{index + 1}</td>
-                                            <td>{record.perusahaan}</td>
-                                            <td>{record.jabatan}</td>
-                                            <td>{record.periode}</td>
-                                            <td>
-                                            <Icon
-                                                name="cross"
-                                                type="Bold"
-                                                cssClass="btn px-1 py-0 text-danger"
-                                                onClick={() => handleDeleteClick(record.id)}
-                                            />
+                                    {records.length > 0 ? (
+                                        records.map((record, index) => (
+                                            <tr key={record.id}>
+                                                <td>{index + 1}</td>
+                                                <td>{record.perusahaan}</td>
+                                                <td>{record.jabatan}</td>
+                                                <td>{record.periode}</td>
+                                                <td>
+                                                    <Icon
+                                                        name="cross"
+                                                        type="Bold"
+                                                        cssClass="btn px-1 py-0 text-danger"
+                                                        onClick={() => handleDelete(record.id)}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="text-muted py-3">
+                                                <i className="fas fa-info-circle"></i> Tidak ada data riwayat pekerjaan.
                                             </td>
                                         </tr>
-                                        ))}
+                                    )}
                                     </tbody>
                                 </table>
 
@@ -692,6 +803,7 @@ const Add = () => {
                                                 label="Nama Perusahaan"
                                                 type="text"
                                                 name="perusahaan"
+                                                placeholder="Masukkan Nama Perusahaan"
                                                 value={formData.perusahaan}
                                                 onChange={handleInputChange}
                                             />
@@ -702,6 +814,7 @@ const Add = () => {
                                                 label="Jabatan"
                                                 type="text"
                                                 name="jabatan"
+                                                placeholder="Masukkan Jabatan"
                                                 value={formData.jabatan}
                                                 onChange={handleInputChange}
                                             />
@@ -711,9 +824,10 @@ const Add = () => {
                                         <div className="row">
                                             <div className="col-md-6">
                                             <Input
-                                                label="Periode Mulai 4 Digit (XXXX)"
+                                                label="Periode Mulai"
                                                 type="text"
                                                 name="periodeMulai"
+                                                placeholder="Masukkan Periode Mulai (20xx)"
                                                 value={formData.periodeMulai}
                                                 onChange={handleInputChange}
                                             />
@@ -721,9 +835,10 @@ const Add = () => {
 
                                             <div className="col-md-6">
                                             <Input
-                                                label="Periode Selesai 4 Digit (XXXX)"
+                                                label="Periode Selesai"
                                                 type="text"
                                                 name="periodeAkhir"
+                                                placeholder="Masukkan Periode Akhir (20xx)"
                                                 value={formData.periodeAkhir}
                                                 onChange={handleInputChange}
                                             />
