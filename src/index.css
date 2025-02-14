@@ -108,41 +108,42 @@ dialog::backdrop {
 }
 
 .custom-navbar {
-  background: linear-gradient(to bottom, white, rgb(219, 219, 219)); /* Vertical gradient */
+  /* background: linear-gradient(to bottom, white, rgb(219, 219, 219));  */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand img {
-  width: 150px; /* Default size for larger screens */
+  width: 150px;
 }
 
-@media (max-width: 1024px) { /* Tablets and smaller devices */
+@media (max-width: 1024px) { 
   .navbar-brand img {
-    width: 100px; /* Adjusts for smaller screens */
+    width: 100px; 
   }
 }
 
-@media (max-width: 768px) { /* Smartphones */
+@media (max-width: 768px) { 
   .navbar-brand img {
-    width: 80px; /* Further reduced for very small screens */
+    width: 80px; 
   }
 }
 
 .custom-container {
-  width: 95%; /* Default width */
-  margin: 0 auto; /* Centering */
+  width: 95%; 
+  margin: 0 auto;
   padding: 20px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .custom-container {
-    width: 98%; /* Slightly wider for tablets */
+    width: 98%; 
   }
 }
 
 @media (max-width: 768px) {
   .custom-container {
-    width: 100%; /* Full width for mobile */
+    width: 100%; 
     padding: 15px;
   }
 }
@@ -150,4 +151,63 @@ dialog::backdrop {
 
 .add-title{
   color: #0A5EA8;
+}
+
+
+/* Base Footer Styles */
+footer {
+  background-color: white;
+  font-family: Arial, sans-serif;
+  padding: 40px 80px;
+  box-shadow: 0px -8px 8px rgba(202, 202, 202, 0.397);
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.footer-container div {
+  flex: 1;
+  margin: 10px;
+  text-align: left;
+}
+
+.footer-container div h3 {
+  color: #005BAA;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-container div p {
+  color: #005BAA;
+  font-size: 16px;
+  margin: 15px 0;
+}
+
+.footer-container div p a {
+  color: #005BAA;
+  text-decoration: none;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.social-icons a {
+  color: #005BAA;
+  font-size: 36px; /* Increased font size */
+  margin: 0 10px;
+}
+
+.footer-bottom {
+  margin-top: 20px;
+  color: #005BAA;
+  font-size: 14px;
+  text-align: center;
 }

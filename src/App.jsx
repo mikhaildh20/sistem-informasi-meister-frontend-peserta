@@ -6,6 +6,7 @@ import CreateRoute from "./component/util/CreateRoute.jsx";
 
 import Navbar from "./component/backbone/Header";
 import Form from "./component/page/pendaftaran-peserta/Add.jsx";
+import Footer from "./component/backbone/Footer";
 
 
 export default function App() {
@@ -18,7 +19,7 @@ export default function App() {
       <Form /> 
     </div>
     <div>
-
+      <Footer />
     </div>
     </>
   );
