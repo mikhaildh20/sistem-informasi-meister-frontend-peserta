@@ -72,7 +72,10 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
     const [photo, setPhoto] = useState(blank);
     const photoRef = useRef(null);
-    const sertifikatRef = useRef(null);
+    const fileSertifikatRef1 = useRef(null);
+    const fileSertifikatRef2 = useRef(null);
+    const fileSertifikatRef3 = useRef(null);
+    const fileSertifikatRef4 = useRef(null);
 
     const [records, setRecords] = useState([]);
 
@@ -305,13 +308,23 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
         // const uploadPromises = [];
 
-        // if (fileGambarRef.current.files.length > 0) {
+        // if (photoRef.current?.files.length > 0 || fileSertifikatRef1.current?.files.length > 0 || fileSertifikatRef2.current?.files.length > 0 || fileSertifikatRef3.current?.files.length > 0 || fileSertifikatRef4.current?.files.length > 0) 
+        // {
         //     uploadPromises.push(
-        //     UploadFile(fileGambarRef.current).then(
-        //         (data) => (formDataRef.current["gambarAlatMesin"] = data.Hasil)
-        //     )
+        //         UploadFile(
+        //         photoRef.current,
+        //         fileSertifikatRef1.current,
+        //         fileSertifikatRef2.current,
+        //         fileSertifikatRef3.current,
+        //         fileSertifikatRef4.current
+        //         ).then((data) => {
+        //         formDataRef.current["fotoPeserta"] = data.FotoPeserta || "";
+        //         formDataRef.current["fileSertifikat"] = data.SertifikatPeserta || "";
+        //         })
         //     );
         // }
+
+
 
         // try {
         //     await Promise.all(uploadPromises);
@@ -874,6 +887,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                 <div className="row">
                                     <div className="col-md-6">
                                         <FileUpload
+                                            ref={fileSertifikatRef1}
                                             label="Scan Bukti Sertifikat Pelatihan 1 (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
@@ -882,6 +896,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
                                     <div className="col-md-6">
                                         <FileUpload
+                                            ref={fileSertifikatRef2}
                                             label="Scan Bukti Sertifikat Pelatihan 2 (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
@@ -892,6 +907,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                 <div className="row">
                                     <div className="col-md-6">
                                         <FileUpload
+                                            ref={fileSertifikatRef3}
                                             label="Scan Bukti Sertifikat Pelatihan 3 (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
@@ -900,6 +916,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
                                     <div className="col-md-6">
                                         <FileUpload
+                                            ref={fileSertifikatRef4}
                                             label="Scan Bukti Sertifikat Pelatihan 4 (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
