@@ -5,7 +5,8 @@ import CreateMenu from "./component/util/CreateMenu";
 import CreateRoute from "./component/util/CreateRoute.jsx";
 
 import Navbar from "./component/backbone/Header";
-import Form from "./component/page/pendaftaran-peserta/Add.jsx";
+import Form from "./component/page/pendaftaran-peserta/Add";
+import Content from "./component/page/pendaftaran-peserta/Root"
 import Footer from "./component/backbone/Footer";
 
 
@@ -16,7 +17,7 @@ export default function App() {
       <Navbar />  
     </div>
     <div>
-      <Form /> 
+      <Content /> 
     </div>
     <div>
       <Footer />

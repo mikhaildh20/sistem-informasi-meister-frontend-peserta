@@ -1,14 +1,17 @@
 import React, { useState, useRef } from "react";
+import { object, string } from "yup";
+import { validateAllInputs, validateInput } from "../../util/ValidateForm";
 import blank from "../../../assets/blankPicture.png";
-import Alert from "../../part/Alert";
 import Dropdown from "../../part/Dropdown";
 import Icon from "../../part/Icon";
-import Checkbox from "../../part/CheckBox";
 import Button from "../../part/Button";
-import Label from "../../part/Label";
 import Input from "../../part/Input";
 import FileUpload from "../../part/FileUpload";
+import UploadFile from "../../util/UploadFile";
+import Alert from "../../part/Alert";
 import SweetAlert from "../../util/SweetAlert";
+import Loading from "../../part/Loading";
+import Label from "../../part/Label";
 
 const listJenisKelamin = [
     {Value: "Laki-laki", Text: "Laki-laki"},
@@ -62,116 +65,130 @@ const listPendidikanTerakhir = [
     {Value: "Sarjana", Text: "Sarjana"},
 ]
 
-
-const Add = () => {
-    const [photo, setPhoto] = useState(null);
+export default function PendaftaranPesertaMeisterAdd({onChangePage}){
     const [errors, setErrors] = useState({});
     const [isError, setIsError] = useState({ error: false, message: "" });
     const [isFormVisible, setIsFormVisible] = useState(false);
 
-    const [formData, setFormData] = useState({
+    const [photo, setPhoto] = useState(blank);
+    const photoRef = useRef(null);
+    const sertifikatRef = useRef(null);
+
+    const [records, setRecords] = useState([]);
+
+    const formDataRef = useRef({
+        idKelompok: "-",
+        idKurikulum: "-",
+        namaPeserta: "",
+        fotoPeserta: "",
+        idProgram: "",
+        tempatLahir: "",
+        tanggalLahir: "",
+        angkatanPeserta: "",
+        jenisKelamin: "",
+        alamatPeserta: "",
+        kodeposPeserta: "",
+        emailPeserta: "",
+        hpPeserta: "",
+        golonganDarah: "",
+        kewarganegaraan: "",
+        agamaPeserta: "",
+        statusPerkawinan: "",
+        emailKantor: "",
+        alamatKantor: "",
+        kodeposKantor: "",
+        hpKantor: "",
+        ukuranSepatu: "",
+        ukuranKemeja: "",
+        kontakDarurat: "",
+        namaDarurat: "",
+        hubunganDarurat: "",
+        mediaSosial: "",
+        kursusPeserta: "",
+        hobiPeserta: "",
+        pendidikanTerakhir: "",
+        namaSekolah: "",
+        tahunLulusSekolah: "",
+        namaPerguruanTinggi: "",
+        tahunLulusPerguruanTinggi: "",
+        fileIjazah: "",
+        fileKtp: "",
+        fileSertifikat: "",
+        tujuanPengiriman: "",
+        dibuatOleh: "aurelio.ramadhan"
+    });
+
+    const userSchema = object({
+        namaPeserta: string()
+        .max(100, "maksimum 100 karakter")
+        .required("harus diisi!"),
+        fotoPeserta: string().required("harus diisi!"),
+        idProgram: string().required("harus diisi!"),
+        tempatLahir: string().required("harus diisi!"),
+        tanggalLahir: string().required("harus diisi!"),
+        angkatanPeserta: string().required("harus diisi!"),
+        jenisKelamin: string().required("harus diisi!"),
+        alamatPeserta: string().required("harus diisi!"),
+        kodeposPeserta: string().required("harus diisi!"),
+        emailPeserta: string().required("harus diisi!"),
+        hpPeserta: string().required("harus diisi!"),
+        golonganDarah: string().required("harus diisi!"),
+        kewarganegaraan: string().required("harus diisi!"),
+        agamaPeserta: string().required("harus diisi!"),
+        statusPerkawinan: string().required("harus diisi!"),
+        emailKantor: string(),
+        alamatKantor: string(),
+        kodeposKantor: string(),
+        hpKantor: string(),
+        ukuranSepatu: string().required("harus diisi!"),
+        ukuranKemeja: string().required("harus diisi!"),
+        kontakDarurat: string(),
+        namaDarurat: string(),
+        hubunganDarurat: string(),
+        mediaSosial: string(),
+        kursusPeserta: string(),
+        hobiPeserta: string(),
+        pendidikanTerakhir: string().required("harus diisi!"),
+        namaSekolah: string().required("harus diisi!"),
+        tahunLulusSekolah: string().required("harus diisi!"),
+        namaPerguruanTinggi: string(),
+        tahunLulusPerguruanTinggi: string(),
+        fileIjazah: string().required("harus diisi!"),
+        fileKtp: string().required("harus diisi!"),
+        fileSertifikat: string(),
+        tujuanPengiriman: string().required("harus diisi!")
+    });
+
+    const [formRiwayatPekerjaan, setFormData] = useState({
         perusahaan: '',
         jabatan: '',
         periodeMulai: '',
         periodeAkhir: '',
     });
 
-    const formDataRef = useRef({
-        kel_id: "-",
-        kur_id: "-",
-        pes_nama: "",
-        pro_id: "",
-        pes_tempat_lahir: "",
-        pes_tanggal_lahir: "",
-        pes_angkatan: "",
-        pes_jenis_kelamin: "",
-        pes_alamat: "",
-        pes_kodepos: "",
-        pes_email: "",
-        pes_hp: "",
-        pes_golongan_darah: "",
-        pes_kewarganegaraan: "",
-        pes_agama: "",
-        pes_status_perkawinan: "",
-        pes_email_perusahaan: "",
-        pes_alamat_perusahaan: "",
-        pes_kodepos_perusahaan: "",
-        pes_hp_perusahaan: "",
-        pes_ukuran_sepatu: "",
-        pes_ukuran_kemeja: "",
-        pes_no_darurat: "",
-        pes_nama_darurat: "",
-        pes_hubungan_darurat: "",
-        pes_media_sosial: "",
-        pes_kursus: "",
-        pes_hobi: "",
-        pes_pendidikan_terakhir: "",
-        pes_nama_sekolah: "",
-        pes_tahun_lulus_sekolah: "",
-        pes_perguruan_tinggi: "",
-        pes_tahun_lulus_perguruan: "",
-        pes_ijazah: "",
-        pes_ktp: "",
-        pes_sertifikat: "",
-        pes_tujuan_kirim: "",
-        pes_created_by: "aurelio.ramadhan",
-    });
-
-    // const userSchema = object({
-    //     pes_nama: string()
-    //         .max(100, "maksimum 100 karakter")
-    //         .required("harus diisi!"),
-    //     pro_id: string().required("harus diisi!"),
-    //     pes_tempat_lahir: string().required("harus diisi!"),
-    //     pes_tanggal_lahir: string().required("harus diisi!"),
-    //     pes_angkatan: string().required("harus diisi!"),
-    //     pes_jenis_kelamin: string().required("harus diisi!"),
-    //     pes_alamat: string().required("harus diisi!"),
-    //     pes_kodepos: string().required("harus diisi!"),
-    //     pes_email: string().required("harus diisi!"),
-    //     pes_hp: string().required("harus diisi!"),
-    //     pes_golongan_darah: string().required("harus diisi!"),
-    //     pes_kewarganegaraan: string().required("harus diisi!"),
-    //     pes_agama: string().required("harus diisi!"),
-    //     pes_status_perkawinan: string().required("harus diisi!"),
-    //     pes_email_perusahaan: string(),
-    //     pes_alamat_perusahaan: string(),
-    //     pes_kodepos_perusahaan: string(),
-    //     pes_hp_perusahaan: string(),
-    //     pes_ukuran_sepatu: string().required("harus diisi!"),
-    //     pes_ukuran_kemeja: string().required("harus diisi!"),
-    //     pes_no_darurat: string(),
-    //     pes_nama_darurat: string(),
-    //     pes_hubungan_darurat: string(),
-    //     pes_media_sosial: string(),
-    //     pes_kursus: string(),
-    //     pes_hobi: string(),
-    //     pes_pendidikan_terakhir: string().required("harus diisi!"),
-    //     pes_nama_sekolah: string().required("harus diisi!"),
-    //     pes_tahun_lulus_sekolah: string().required("harus diisi!"),
-    //     pes_perguruan_tinggi: string(),
-    //     pes_tahun_lulus_perguruan: string(),
-    //     pes_ijazah: string().required("harus diisi!"),
-    //     pes_ktp: string().required("harus diisi!"),
-    //     pes_sertifikat: string(),
-    //     pes_tujuan_kirim: string().required("harus diisi!"),
-    // });
-
-    const [records, setRecords] = useState([]);
-
     const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        const validationError = validateInput(name, value, userSchema);
+        formDataRef.current[name] = value;
+        setErrors((prevErrors) => ({
+        ...prevErrors,
+        [validationError.name]: validationError.error,
+        }));
+    };
+
+    const handleInputRiwayat = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleTambahClick = () => {
-        setIsFormVisible(true); // Show the form
+        setIsFormVisible(prev => !prev);
     };
 
     const handleBatalClick = () => {
     setErrors({});
     setIsError({ error: false, message: "" });
-    setIsFormVisible(false); // Hide the form
+    setIsFormVisible(false);
     setFormData({
         perusahaan: '',
         jabatan: '',
@@ -183,20 +200,18 @@ const Add = () => {
     const handleSimpanClick = () => {
         const requiredFields = ["perusahaan", "jabatan", "periodeMulai", "periodeAkhir"];
         
-        // Validate fields dynamically
         const newErrors = requiredFields.reduce((acc, field) => {
-            if (!formData[field]?.trim()) {
+            if (!formRiwayatPekerjaan[field]?.trim()) {
                 acc[field] = `Field ${field} harus diisi!`;
             }
             return acc;
         }, {});
     
-        // Validate Periode (Only 4-digit numbers)
         const yearPattern = /^\d{4}$/;
-        if (!yearPattern.test(formData.periodeMulai)) {
+        if (!yearPattern.test(formRiwayatPekerjaan.periodeMulai)) {
             newErrors.periodeMulai = "Periode Mulai harus berupa angka 4 digit (contoh: 2020)!";
         }
-        if (!yearPattern.test(formData.periodeAkhir)) {
+        if (!yearPattern.test(formRiwayatPekerjaan.periodeAkhir)) {
             newErrors.periodeAkhir = "Periode Akhir harus berupa angka 4 digit (contoh: 2025)!";
         }
     
@@ -206,17 +221,15 @@ const Add = () => {
             return;
         }
     
-        // Ensure periodeMulai is earlier than periodeAkhir
-        if (parseInt(formData.periodeMulai) > parseInt(formData.periodeAkhir)) {
+        if (parseInt(formRiwayatPekerjaan.periodeMulai) > parseInt(formRiwayatPekerjaan.periodeAkhir)) {
             setIsError({ error: true, message: "Periode Mulai tidak boleh lebih besar dari Periode Akhir!" });
             return;
         }
     
-        // Check for duplicate entries
         const isDuplicate = records.some(
             (record) =>
-                record.perusahaan.toLowerCase() === formData.perusahaan.toLowerCase() &&
-                record.jabatan.toLowerCase() === formData.jabatan.toLowerCase()
+                record.perusahaan.toLowerCase() === formRiwayatPekerjaan.perusahaan.toLowerCase() &&
+                record.jabatan.toLowerCase() === formRiwayatPekerjaan.jabatan.toLowerCase()
         );
     
         if (isDuplicate) {
@@ -229,34 +242,108 @@ const Add = () => {
     
         const newRecord = {
             id: records.length + 1,
-            perusahaan: formData.perusahaan.trim(),
-            jabatan: formData.jabatan.trim(),
-            periode: `${formData.periodeMulai}-${formData.periodeAkhir}`,
+            perusahaan: formRiwayatPekerjaan.perusahaan.trim(),
+            jabatan: formRiwayatPekerjaan.jabatan.trim(),
+            periode: `${formRiwayatPekerjaan.periodeMulai}-${formRiwayatPekerjaan.periodeAkhir}`,
         };
     
-        setRecords((prev) => [...prev, newRecord]); // Add new record to table
-        handleBatalClick(); // Hide the form after saving
+        setRecords((prev) => [...prev, newRecord]);
+        handleBatalClick();
     };        
 
 
     const handleDeleteClick = (id) => {
-        setRecords((prev) => prev.filter((record) => record.id !== id)); // Remove record by id
+        setRecords((prev) => prev.filter((record) => record.id !== id));
     };
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-        setPhoto(URL.createObjectURL(file));
+    const handleFileChange = (ref, extAllowed, isPhoto = false) => {
+        const { name, value } = ref.current;
+        const file = ref.current.files[0];
+    
+        if (!file) return;
+    
+        const fileName = file.name;
+        const fileSize = file.size;
+        const fileExt = fileName.split(".").pop().toLowerCase();
+        const validationError = validateInput(name, value, userSchema);
+        let error = "";
+    
+        if (fileSize / 1024576 > 10) error = "berkas terlalu besar";
+        else if (!extAllowed.split(",").includes(fileExt))
+            error = "format berkas tidak valid";
+    
+        if (error) {
+            ref.current.value = "";
+        } else if (isPhoto) {
+            setPhoto(URL.createObjectURL(file));
         }
+    
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [validationError.name]: error,
+        }));
     };
+    
 
     const handleUploadClick = () => {
         document.getElementById("photoInput").click();
     };
 
-    
+    const handleAdd = async (e) => {
+        // e.preventDefault();
+
+        // const validationErrors = await validateAllInputs(
+        // formDataRef.current,
+        // userSchema,
+        // setErrors
+        // );
+
+        // if (Object.values(validationErrors).every((error) => !error)) {
+        // setIsLoading(true);
+        // setIsError((prevError) => ({ ...prevError, error: false }));
+        // setErrors({});
+
+        // const uploadPromises = [];
+
+        // if (fileGambarRef.current.files.length > 0) {
+        //     uploadPromises.push(
+        //     UploadFile(fileGambarRef.current).then(
+        //         (data) => (formDataRef.current["gambarAlatMesin"] = data.Hasil)
+        //     )
+        //     );
+        // }
+
+        // try {
+        //     await Promise.all(uploadPromises);
+
+        //     const data = await UseFetch(
+        //     API_LINK + "MasterAlatMesin/CreateAlatMesin",
+        //     formDataRef.current
+        //     );
+
+        //     if (data === "ERROR") {
+        //     throw new Error(
+        //         "Terjadi kesalahan: Gagal menyimpan data alat/mesin."
+        //     );
+        //     } else {
+        //     SweetAlert("Sukses", "Data alat/mesin berhasil disimpan", "success");
+        //     onChangePage("index");
+        //     }
+        // } catch (error) {
+        //     window.scrollTo(0, 0);
+        //     setIsError((prevError) => ({
+        //     ...prevError,
+        //     error: true,
+        //     message: error.message,
+        //     }));
+        // } finally {
+        //     setIsLoading(false);
+        // }
+        // } else window.scrollTo(0, 0);
+    };
 
     return(
+        <>
         <div className="custom-container">
             {/* {isError.error && (
                 <div className="flex-fill">
@@ -266,7 +353,7 @@ const Add = () => {
             <div className="card mt-3">
                 <div className="card-header"><h2 className="add-title">Formulir Pendaftaran</h2></div>
                 <div className="card-body">
-                    <form onSubmit=""> 
+                    <form onSubmit={handleAdd}> 
                     <div className="card">
                     <div className="card-header"><h5>Data Pribadi</h5></div>
                         <div className="card-body">
@@ -276,7 +363,7 @@ const Add = () => {
                                     <div className="border rounded p-2 d-flex flex-column align-items-center">
                                         <div className="w-100">
                                             <img
-                                            src={photo || blank}
+                                            src={photo}
                                             alt="Profile"
                                             className="img-fluid rounded"
                                             style={{ width: "100%", height: "490px", objectFit: "cover" }}
@@ -293,8 +380,9 @@ const Add = () => {
                                             type="file"
                                             id="photoInput"
                                             className="d-none"
-                                            onChange={handleFileChange}
-                                            accept="image/*"
+                                            ref={photoRef} 
+                                            accept="image/jpeg, image/png" 
+                                            onChange={() => handleFileChange(photoRef, "jpg,jpeg,png", true)}
                                         />
                                         </div>
                                     </div>
@@ -304,19 +392,25 @@ const Add = () => {
 
                                             <div className="col-md-6">
                                                 <Input
+                                                    forInput="namaPeserta"
                                                     label="Nama Peserta"
                                                     type="text"
                                                     placeholder="Masukkan Nama Peserta"
-                                                    value={formDataRef.current.pes_nama}
+                                                    value={formDataRef.namaPeserta}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.namaPeserta}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-6">
                                                 <Dropdown
+                                                    forInput="idProgram"
                                                     label="Program Meister"
                                                     arrData={listProgramMeister}
-                                                    value={formDataRef.current.pro_id}
+                                                    value={formDataRef.current.idProgram}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.idProgram}
                                                     isRequired
                                                 />
                                             </div>
@@ -327,19 +421,25 @@ const Add = () => {
 
                                             <div className="col-md-6">
                                                 <Input
+                                                    forInput="tempatLahir"
                                                     label="Tempat Lahir"
                                                     type="text"
                                                     placeholder="Masukkan Tempat Lahir"
-                                                    value={formDataRef.current.pes_tempat_lahir}
+                                                    value={formDataRef.current.tempatLahir}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.tempatLahir}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-6">
                                                 <Input
+                                                    forInput="tanggalLahir"
                                                     label="Tanggal Lahir"
                                                     type="date"
-                                                    value={formDataRef.current.pes_tanggal_lahir}
+                                                    value={formDataRef.current.tanggalLahir}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.tanggalLahir}
                                                     isRequired
                                                 />
                                             </div>
@@ -350,19 +450,25 @@ const Add = () => {
 
                                             <div className="col-md-6">
                                                 <Input
+                                                    forInput="angkatanPeserta"
                                                     label="Angkatan"
                                                     type="text"
                                                     placeholder="Masukkan Angkatan (20xx)"
-                                                    value={formDataRef.current.pes_angkatan}
+                                                    value={formDataRef.current.angkatanPeserta}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.angkatanPeserta}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-6">
                                                 <Dropdown
+                                                    forInput="jenisKelamin"
                                                     label="Jenis Kelamin"
                                                     arrData={listJenisKelamin}
-                                                    value={formDataRef.current.pes_jenis_kelamin}
+                                                    value={formDataRef.current.jenisKelamin}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.jenisKelamin}
                                                     isRequired
                                                 />
                                             </div>
@@ -373,20 +479,26 @@ const Add = () => {
 
                                             <div className="col-md-6">
                                                 <Input
+                                                    forInput="alamatPeserta"
                                                     label="Alamat"
                                                     type="text"
                                                     placeholder="Masukkan Alamat"
-                                                    value={formDataRef.current.pes_alamat}
+                                                    value={formDataRef.current.alamatPeserta}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.alamatPeserta}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-6">
                                                 <Input
+                                                    forInput="kodeposPeserta"
                                                     label="Kode Pos"
                                                     type="text"
                                                     placeholder="Masukkan Kode Pos"
-                                                    value={formDataRef.current.pes_kodepos}
+                                                    value={formDataRef.current.kodeposPeserta}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.kodeposPeserta}
                                                     isRequired
                                                 />
                                             </div>
@@ -397,20 +509,26 @@ const Add = () => {
 
                                             <div className="col-md-6">
                                                 <Input
+                                                    forInput="emailPeserta"
                                                     label="Email"
                                                     type="email"
                                                     placeholder="Masukkan Email"
-                                                    value={formDataRef.current.pes_email}
+                                                    value={formDataRef.current.emailPeserta}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.emailPeserta}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-6">
                                                 <Input
+                                                    forInput="hpPeserta"
                                                     label="Nomor HP"
                                                     type="text"
                                                     placeholder="Masukkan Nomor HP"
-                                                    value={formDataRef.current.pes_hp}
+                                                    value={formDataRef.current.hpPeserta}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.hpPeserta}
                                                     isRequired
                                                 />
                                             </div>
@@ -421,18 +539,24 @@ const Add = () => {
 
                                             <div className="col-md-6">
                                                 <Dropdown
+                                                    forInput="golonganDarah"
                                                     label="Golongan Darah"
                                                     arrData={listGolonganDarah}
-                                                    value={formDataRef.current.pes_golongan_darah}
+                                                    value={formDataRef.current.golonganDarah}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.golonganDarah}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-6">
                                                 <Dropdown
+                                                    forInput="kewarganegaraan"
                                                     label="Kewarganegaraan"
                                                     arrData={listKewarganegaraan}
-                                                    value={formDataRef.current.pes_kewarganegaraan}
+                                                    value={formDataRef.current.kewarganegaraan}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.kewarganegaraan}
                                                     isRequired
                                                 />
                                             </div>
@@ -443,18 +567,24 @@ const Add = () => {
 
                                             <div className="col-md-6">
                                                 <Dropdown
+                                                    forInput="agamaPeserta"
                                                     label="Agama"
                                                     arrData={listAgama}
-                                                    value={formDataRef.current.pes_agama}
+                                                    value={formDataRef.current.agamaPeserta}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.agamaPeserta}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-6">
                                                 <Dropdown
+                                                    forInput="statusPerkawinan"
                                                     label="Status Perkawinan"
                                                     arrData={listStatusPerkawinan}
-                                                    value={formDataRef.current.pes_status_perkawinan}
+                                                    value={formDataRef.current.statusPerkawinan}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.statusPerkawinan}
                                                     isRequired
                                                 />
                                             </div>
@@ -471,30 +601,39 @@ const Add = () => {
                                         <div className="row">
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="emailKantor"
                                                     label="Email Perusahaan"
                                                     type="text"
                                                     placeholder="Masukkan Email Perusahaan"
-                                                    value={formDataRef.current.pes_email_perusahaan}
+                                                    value={formDataRef.current.emailKantor}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.emailKantor}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="alamatKantor"
                                                     label="Alamat Perusahaan"
                                                     type="text"
                                                     placeholder="Masukkan Alamat Perusahaan"
-                                                    value={formDataRef.current.pes_alamat_perusahaan}
+                                                    value={formDataRef.current.alamatKantor}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.alamatKantor}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="kodeposKantor"
                                                     label="Kode Pos Perusahaan"
                                                     placeholder="Masukkan Kode Pos Perusahaan"
                                                     type="text"
-                                                    value={formDataRef.current.pes_kodepos_perusahaan}
+                                                    value={formDataRef.current.kodeposKantor}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.kodeposKantor}
                                                     isRequired
                                                 />
                                             </div>
@@ -509,29 +648,38 @@ const Add = () => {
                                         <div className="row">
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="hpKantor"
                                                     label="Telepon Perusahaan"
                                                     placeholder="Masukkan Telepon Perusahaan"
                                                     type="text"
-                                                    value={formDataRef.current.pes_hp_perusahaan}
+                                                    value={formDataRef.current.hpKantor}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.hpKantor}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="ukuranSepatu"
                                                     label="Ukuran Sepatu"
                                                     placeholder="Masukkan Ukuran Sepatu (xx)"
                                                     type="text"
-                                                    value={formDataRef.current.pes_ukuran_sepatu}
+                                                    value={formDataRef.current.ukuranSepatu}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.ukuranSepatu}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-4">
                                                 <Dropdown
+                                                    forInput="ukuranKemeja"
                                                     label="Ukuran Kemeja"
                                                     arrData={listUkuranBaju}
-                                                    value={formDataRef.current.pes_ukuran_kemeja}
+                                                    value={formDataRef.current.ukuranKemeja}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.ukuranKemeja}
                                                     isRequired
                                                 />
                                             </div>
@@ -546,30 +694,39 @@ const Add = () => {
                                         <div className="row">
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="kontakDarurat"
                                                     label="Kontak Darurat"
                                                     type="text"
                                                     placeholder="Masukkan Kontak Darurat (08xxxxx)"
-                                                    value={formDataRef.current.pes_no_darurat}
+                                                    value={formDataRef.current.kontakDarurat}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.kontakDarurat}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="namaDarurat"
                                                     label="Nama Kontak Darurat"
                                                     type="text"
                                                     placeholder="Masukkan Nama Kontak"
-                                                    value={formDataRef.current.pes_nama_darurat}
+                                                    value={formDataRef.current.namaDarurat}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.namaDarurat}
                                                     isRequired
                                                 />
                                             </div>
 
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="hubunganDarurat"
                                                     label="Hubungan Kontak Darurat"
                                                     placeholder="Masukkan Hubungan Kontak"
-                                                    value={formDataRef.current.pes_hubungan_darurat}
+                                                    value={formDataRef.current.hubunganDarurat}
                                                     type="text"
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.hubunganDarurat}
                                                     isRequired
                                                 />
                                             </div>
@@ -584,27 +741,33 @@ const Add = () => {
                                         <div className="row">
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="mediaSosial"
                                                     label="Media Sosial"
                                                     placeholder="Masukkan Media Sosial"
-                                                    value={formDataRef.current.pes_media_sosial}
+                                                    value={formDataRef.current.mediaSosial}
+                                                    onChange={handleInputChange}
                                                     type="text"
                                                 />
                                             </div>
 
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="kursusPeserta"
                                                     label="Kursus"
                                                     placeholder="Masukkan Kursus"
-                                                    value={formDataRef.current.pes_kursus}
+                                                    value={formDataRef.current.kursusPeserta}
+                                                    onChange={handleInputChange}
                                                     type="text"
                                                 />
                                             </div>
 
                                             <div className="col-md-4">
                                                 <Input
+                                                    forInput="hobiPeserta"
                                                     label="Hobi"
                                                     placeholder="Masukkan Hobi"
-                                                    value={formDataRef.current.pes_hobi}
+                                                    value={formDataRef.current.hobiPeserta}
+                                                    onChange={handleInputChange}
                                                     type="text"
                                                 />
                                             </div>
@@ -622,29 +785,38 @@ const Add = () => {
                                 <div className="row">
                                     <div className="col-md-4">
                                         <Dropdown
+                                            forInput="pendidikanTerakhir"
                                             label="Pendidikan Terakhir"
                                             arrData={listPendidikanTerakhir}
-                                            value={formDataRef.current.pes_pendidikan_terakhir}
+                                            value={formDataRef.current.pendidikanTerakhir}
+                                            onChange={handleInputChange}
+                                            errorMessage={errors.pendidikanTerakhir}
                                             isRequired
                                         />
                                     </div>
 
                                     <div className="col-md-4">
                                         <Input
+                                            forInput="namaSekolah"
                                             label="Nama Sekolah"
                                             type="text"
                                             placeholder="Masukkan Nama Sekolah"
-                                            value={formDataRef.current.pes_nama_sekolah}
+                                            value={formDataRef.current.namaSekolah}
+                                            onChange={handleInputChange}
+                                            errorMessage={errors.namaSekolah}
                                             isRequired
                                         />
                                     </div>
 
                                     <div className="col-md-4">
                                         <Input
+                                            forInput="tahunLulusSekolah"
                                             label="Tahun Lulus Sekolah"
                                             placeholder="Masukkan Tahun Lulus Sekolah"
-                                            value={formDataRef.current.pes_tahun_lulus_sekolah}
+                                            value={formDataRef.current.tahunLulusSekolah}
                                             type="text"
+                                            onChange={handleInputChange}
+                                            errorMessage={errors.tahunLulusSekolah}
                                             isRequired
                                         />
                                     </div>
@@ -654,16 +826,22 @@ const Add = () => {
                                 <div className="row">
                                     <div className="col-md-4">
                                         <Input
+                                            forInput="namaPerguruanTinggi"
                                             label="Nama Perguruan Tinggi"
                                             placeholder="Masukkan Nama Perguruan Tinggi"
+                                            value={formDataRef.current.namaPerguruanTinggi}
+                                            onChange={handleInputChange}
                                             type="text"
                                         />
                                     </div>
 
                                     <div className="col-md-4">
                                         <Input
+                                            forInput="tahunLulusPerguruanTinggi"
                                             label="Tahun Lulus Perguruan Tinggi"
                                             placeholder="Masukkan Tahun Lulus Perguruan Tinggi"
+                                            value={formDataRef.current.tahunLulusPerguruanTinggi}
+                                            onChange={handleInputChange}
                                             type="text"
                                         />
                                     </div>
@@ -680,11 +858,6 @@ const Add = () => {
                                             label="Scan Ijazah Pendidikan Terakhir (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
-                                            // ref={fileGambarRef}
-                                            // onChange={() =>
-                                            //     handleFileChange(fileGambarRef, "pdf,jpg,png")
-                                            // }
-                                            // errorMessage={errors.gambarAlatMesin}
                                         />
                                     </div>
 
@@ -693,11 +866,6 @@ const Add = () => {
                                             label="Scan KTP (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
-                                            // ref={fileGambarRef}
-                                            // onChange={() =>
-                                            //     handleFileChange(fileGambarRef, "pdf,jpg,png")
-                                            // }
-                                            // errorMessage={errors.gambarAlatMesin}
                                         />
                                     </div>
                                 </div>
@@ -709,11 +877,6 @@ const Add = () => {
                                             label="Scan Bukti Sertifikat Pelatihan 1 (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
-                                            // ref={fileGambarRef}
-                                            // onChange={() =>
-                                            //     handleFileChange(fileGambarRef, "pdf,jpg,png")
-                                            // }
-                                            // errorMessage={errors.gambarAlatMesin}
                                         />
                                     </div>
 
@@ -722,11 +885,6 @@ const Add = () => {
                                             label="Scan Bukti Sertifikat Pelatihan 2 (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
-                                            // ref={fileGambarRef}
-                                            // onChange={() =>
-                                            //     handleFileChange(fileGambarRef, "pdf,jpg,png")
-                                            // }
-                                            // errorMessage={errors.gambarAlatMesin}
                                         />
                                     </div>
                                 </div>
@@ -737,11 +895,6 @@ const Add = () => {
                                             label="Scan Bukti Sertifikat Pelatihan 3 (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
-                                            // ref={fileGambarRef}
-                                            // onChange={() =>
-                                            //     handleFileChange(fileGambarRef, "pdf,jpg,png")
-                                            // }
-                                            // errorMessage={errors.gambarAlatMesin}
                                         />
                                     </div>
 
@@ -750,11 +903,6 @@ const Add = () => {
                                             label="Scan Bukti Sertifikat Pelatihan 4 (.pdf, .jpg, .png)"
                                             formatFile=".pdf,.jpg,.png"
                                             isRequired
-                                            // ref={fileGambarRef}
-                                            // onChange={() =>
-                                            //     handleFileChange(fileGambarRef, "pdf,jpg,png")
-                                            // }
-                                            // errorMessage={errors.gambarAlatMesin}
                                         />
                                     </div>
                                 </div>
@@ -765,7 +913,7 @@ const Add = () => {
                         <div className="card-header d-flex justify-content-between align-items-center">
                             <h5>Riwayat Pekerjaan</h5>
                             <Button
-                                classType="primary"
+                                classType="success"
                                 label="Tambah"
                                 iconName="plus"
                                 onClick={handleTambahClick}
@@ -795,7 +943,7 @@ const Add = () => {
                                                         name="cross"
                                                         type="Bold"
                                                         cssClass="btn px-1 py-0 text-danger"
-                                                        onClick={() => handleDelete(record.id)}
+                                                        onClick={() => handleDeleteClick(record.id)}
                                                     />
                                                 </td>
                                             </tr>
@@ -833,8 +981,8 @@ const Add = () => {
                                                 type="text"
                                                 name="perusahaan"
                                                 placeholder="Masukkan Nama Perusahaan"
-                                                value={formData.perusahaan}
-                                                onChange={handleInputChange}
+                                                value={formRiwayatPekerjaan.perusahaan}
+                                                onChange={handleInputRiwayat}
                                             />
                                             </div>
 
@@ -844,8 +992,8 @@ const Add = () => {
                                                 type="text"
                                                 name="jabatan"
                                                 placeholder="Masukkan Jabatan"
-                                                value={formData.jabatan}
-                                                onChange={handleInputChange}
+                                                value={formRiwayatPekerjaan.jabatan}
+                                                onChange={handleInputRiwayat}
                                             />
                                             </div>
                                         </div>
@@ -857,8 +1005,8 @@ const Add = () => {
                                                 type="text"
                                                 name="periodeMulai"
                                                 placeholder="Masukkan Periode Mulai (20xx)"
-                                                value={formData.periodeMulai}
-                                                onChange={handleInputChange}
+                                                value={formRiwayatPekerjaan.periodeMulai}
+                                                onChange={handleInputRiwayat}
                                             />
                                             </div>
 
@@ -868,8 +1016,8 @@ const Add = () => {
                                                 type="text"
                                                 name="periodeAkhir"
                                                 placeholder="Masukkan Periode Akhir (20xx)"
-                                                value={formData.periodeAkhir}
-                                                onChange={handleInputChange}
+                                                value={formRiwayatPekerjaan.periodeAkhir}
+                                                onChange={handleInputRiwayat}
                                             />
                                             </div>
                                         </div>
@@ -879,13 +1027,13 @@ const Add = () => {
                                             classType="secondary mt-3"
                                             label="Batal"
                                             iconName="cross"
-                                            onClick={handleBatalClick} // Hide the form when cancelled
+                                            onClick={handleBatalClick}
                                             />
                                             <Button
                                             classType="primary mt-3"
                                             label="Simpan"
                                             iconName="check"
-                                            onClick={handleSimpanClick} // Save the form data to the table
+                                            onClick={handleSimpanClick}
                                             />
                                         </div>
                                         </div>
@@ -942,7 +1090,6 @@ const Add = () => {
                 </div>
             </div>
         </div>
+    </>
     );
-};
-
-export default Add;
+}
