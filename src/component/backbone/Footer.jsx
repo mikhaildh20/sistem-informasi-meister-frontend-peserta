@@ -1,4 +1,5 @@
 import logo from "../../assets/IMG_Logo.png";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export default function Footer() {
     return (

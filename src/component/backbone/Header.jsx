@@ -3,19 +3,46 @@ import { API_LINK, APPLICATION_ID, ROOT_LINK } from "../util/Constants";
 import logo from "../../assets/IMG_Logo.png";
 
 const Header = () => {
+
+  const handleDaftar = () => {
+    localStorage.removeItem("activeMenu");
+    window.location.href = ROOT_LINK + "/" + "daftar"; 
+  };
   return (
-    <nav className="navbar custom-navbar">
-      <div className="container-fluid">
-        <a className="navbar-brand" href="#">
+    <div>
+      <nav>
+        <div className="">
           <img
             src={logo}
-            alt="Logo"
-            className="d-inline-block align-text-top img-fluid"
-            style={{ width: "150px", height: "auto" }}
+            alt="Logo ASTRAtech"
+            title="Logo ASTRAtech"
+            width="190px"
           />
-        </a>
-      </div>
-    </nav>
+        </div>
+
+        <div className="btnlogindaftar">
+          <div className="d-flex">
+            <button
+              className="daftar mt-2 mr-4"
+              style={{
+                backgroundColor: "#0A5EA8",
+                color: "white",
+                fontWeight: "600",
+                border: "none",
+                cursor: "pointer",
+                padding: "8px 25px",
+                borderRadius: "12px",
+                transition: "background-color 0.3s",
+              }}
+              onClick={handleDaftar} 
+            >
+              Daftar
+            </button>
+          </div>
+        </div>
+      </nav>
+
+    </div>
   );
 };
 

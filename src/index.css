@@ -107,6 +107,72 @@ dialog::backdrop {
   }
 }
 
+/* Header navigation bar */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4%;
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 80px;
+  box-shadow: 0px 4px 16px rgba(77, 77, 77, 0.2);
+  z-index: 1000;
+}
+
+/* Logo styling */
+.logo img {
+  width: 170px;
+  height: 40px;
+}
+
+/* Button container */
+.btnlogindaftar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Daftar button styling */
+.daftar {
+  background-color: #0A5EA8;
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  padding: 8px 25px;
+  border-radius: 12px;
+  transition: background-color 0.3s;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  
+  .logo img {
+    width: 160px;
+  }
+
+  .menu-profile-container {
+    flex-direction: column;
+  }
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .btnlogindaftar {
+   
+    width: 100%;
+  }
+
+  .logo img {
+    width: 160px;
+  }
+}
+
 .custom-navbar {
   /* background: linear-gradient(to bottom, white, rgb(219, 219, 219));  */
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -158,7 +224,7 @@ dialog::backdrop {
 footer {
   background-color: white;
   font-family: Arial, sans-serif;
-  padding: 40px 80px;
+  padding: 40px 59px;
   box-shadow: 0px -8px 8px rgba(202, 202, 202, 0.397);
 }
 
@@ -210,4 +276,54 @@ footer {
   color: #005BAA;
   font-size: 14px;
   text-align: center;
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 1024px) {
+  footer {
+    padding: 30px 40px;
+  }
+
+  .footer-container div {
+    flex: 1 1 100%; /* Allow columns to stack on smaller screens */
+    text-align: center;
+  }
+
+  .footer-container div h3 {
+    font-size: 16px;
+  }
+
+  .footer-container div p {
+    font-size: 14px;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  footer {
+    padding: 20px 30px;
+  }
+
+  .footer-container div {
+    flex: 1 1 100%;
+  }
+
+  .footer-container div h3 {
+    font-size: 14px;
+  }
+
+  .footer-container div p {
+    font-size: 12px;
+  }
+
+  .social-icons a {
+    font-size: 30px;
+  }
+
+  .footer-bottom {
+    font-size: 12px;
+  }
 }

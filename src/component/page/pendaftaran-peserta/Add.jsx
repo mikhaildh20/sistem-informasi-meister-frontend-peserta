@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { object, string } from "yup";
+import { API_LINK } from "../../util/Constants";
 import { validateAllInputs, validateInput } from "../../util/ValidateForm";
 import blank from "../../../assets/blankPicture.png";
 import Dropdown from "../../part/Dropdown";
@@ -7,6 +8,7 @@ import Icon from "../../part/Icon";
 import Button from "../../part/Button";
 import Input from "../../part/Input";
 import FileUpload from "../../part/FileUpload";
+import UseFetch from "../../util/UseFetch";
 import UploadFile from "../../util/UploadFile";
 import Alert from "../../part/Alert";
 import SweetAlert from "../../util/SweetAlert";
@@ -68,20 +70,9 @@ const listPendidikanTerakhir = [
 export default function PendaftaranPesertaMeisterAdd({onChangePage}){
     const [errors, setErrors] = useState({});
     const [isError, setIsError] = useState({ error: false, message: "" });
-    const [isFormVisible, setIsFormVisible] = useState(false);
-
-    const [photo, setPhoto] = useState(blank);
-    const photoRef = useRef(null);
-    const fileSertifikatRef1 = useRef(null);
-    const fileSertifikatRef2 = useRef(null);
-    const fileSertifikatRef3 = useRef(null);
-    const fileSertifikatRef4 = useRef(null);
-
-    const [records, setRecords] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const formDataRef = useRef({
-        idKelompok: "-",
-        idKurikulum: "-",
         namaPeserta: "",
         fotoPeserta: "",
         idProgram: "",
@@ -117,15 +108,14 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         fileIjazah: "",
         fileKtp: "",
         fileSertifikat: "",
-        tujuanPengiriman: "",
-        dibuatOleh: "aurelio.ramadhan"
+        tujuanPengiriman: "Rumah",
     });
 
     const userSchema = object({
         namaPeserta: string()
         .max(100, "maksimum 100 karakter")
         .required("harus diisi!"),
-        fotoPeserta: string().required("harus diisi!"),
+        fotoPeserta: string(),
         idProgram: string().required("harus diisi!"),
         tempatLahir: string().required("harus diisi!"),
         tanggalLahir: string().required("harus diisi!"),
@@ -156,11 +146,21 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         tahunLulusSekolah: string().required("harus diisi!"),
         namaPerguruanTinggi: string(),
         tahunLulusPerguruanTinggi: string(),
-        fileIjazah: string().required("harus diisi!"),
-        fileKtp: string().required("harus diisi!"),
+        fileIjazah: string(),
+        fileKtp: string(),
         fileSertifikat: string(),
         tujuanPengiriman: string().required("harus diisi!")
     });
+
+    const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
+    const [sertifikatFiles, setSertifikatFiles] = useState([]);
+    const [photo, setPhoto] = useState(blank);
+    const [records, setRecords] = useState([]);
+    const [selectedAlamat, setSelectedAlamat] = useState(formDataRef.current.tujuanPengiriman);
+    const photoRef = useRef(null);
+    const ijazahRef = useRef(null);
+    const ktpRef = useRef(null);
 
     const [formRiwayatPekerjaan, setFormData] = useState({
         perusahaan: '',
@@ -177,6 +177,17 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         ...prevErrors,
         [validationError.name]: validationError.error,
         }));
+    };
+    
+    const addFileUpload = () => {
+        setSertifikatFiles((prevFiles) => [
+          ...prevFiles,
+          { id: Date.now(), ref: null }, // Temporarily store `null` for the ref
+        ]);
+      };
+
+    const removeFileUpload = (id) => {
+        setSertifikatFiles(sertifikatFiles.filter((file) => file.id !== id));
     };
 
     const handleInputRiwayat = (e) => {
@@ -286,6 +297,13 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
             [validationError.name]: error,
         }));
     };
+
+    const handleRadioChange = (e) => {
+        const value = e.target.value;
+        setSelectedAlamat(value);
+        formDataRef.current.tujuanPengiriman = value;
+        console.log("Selected:", formDataRef.current.tujuanPengiriman);
+    };
     
 
     const handleUploadClick = () => {
@@ -293,78 +311,91 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
     };
 
     const handleAdd = async (e) => {
-        // e.preventDefault();
+        e.preventDefault();
 
-        // const validationErrors = await validateAllInputs(
-        // formDataRef.current,
-        // userSchema,
-        // setErrors
-        // );
+        if (!isChecked) {
+            SweetAlert("Peringatan", "Tolong centang data pernyataaan!", "warning");
+            return;
+          }
 
-        // if (Object.values(validationErrors).every((error) => !error)) {
-        // setIsLoading(true);
-        // setIsError((prevError) => ({ ...prevError, error: false }));
-        // setErrors({});
+        const validationErrors = await validateAllInputs(
+        formDataRef.current,
+        userSchema,
+        setErrors
+        );
+        
+        console.log(validationErrors);
+
+        if (Object.values(validationErrors).every((error) => !error)) {
+        setIsLoading(true);
+        setIsError((prevError) => ({ ...prevError, error: false }));
+        setErrors({});
 
         // const uploadPromises = [];
 
-        // if (photoRef.current?.files.length > 0 || fileSertifikatRef1.current?.files.length > 0 || fileSertifikatRef2.current?.files.length > 0 || fileSertifikatRef3.current?.files.length > 0 || fileSertifikatRef4.current?.files.length > 0) 
+        // if (photoRef.current?.files.length > 0 || sertifikatFiles.some((file) => file.ref.current?.files.length > 0)) 
         // {
-        //     uploadPromises.push(
-        //         UploadFile(
-        //         photoRef.current,
-        //         fileSertifikatRef1.current,
-        //         fileSertifikatRef2.current,
-        //         fileSertifikatRef3.current,
-        //         fileSertifikatRef4.current
-        //         ).then((data) => {
-        //         formDataRef.current["fotoPeserta"] = data.FotoPeserta || "";
-        //         formDataRef.current["fileSertifikat"] = data.SertifikatPeserta || "";
-        //         })
-        //     );
+        //     uploadPromises.push(UploadFile(photoRef.current));
+        //     const sertifikatUploads = sertifikatFiles
+        //     .filter((file) => file.ref.current?.files.length > 0)
+        //     .map((file) => UploadFile(file.ref.current));
+    
+        //     uploadPromises.push(...sertifikatUploads);
         // }
 
 
 
-        // try {
-        //     await Promise.all(uploadPromises);
+        try {
+            // await Promise.all(uploadPromises);
+            // formDataRef.current["fotoPeserta"] = uploadedData[0]?.FotoPeserta || "";
+            // formDataRef.current["fileSertifikat"] = uploadedData.slice(1).map((data) => data.SertifikatPeserta) || [];
 
-        //     const data = await UseFetch(
-        //     API_LINK + "MasterAlatMesin/CreateAlatMesin",
-        //     formDataRef.current
-        //     );
+            const data = await UseFetch(
+            API_LINK + "PendaftaranPeserta/CreatePendaftaranPeserta",
+            formDataRef.current
+            );
 
-        //     if (data === "ERROR") {
-        //     throw new Error(
-        //         "Terjadi kesalahan: Gagal menyimpan data alat/mesin."
-        //     );
-        //     } else {
-        //     SweetAlert("Sukses", "Data alat/mesin berhasil disimpan", "success");
-        //     onChangePage("index");
-        //     }
-        // } catch (error) {
-        //     window.scrollTo(0, 0);
-        //     setIsError((prevError) => ({
-        //     ...prevError,
-        //     error: true,
-        //     message: error.message,
-        //     }));
-        // } finally {
-        //     setIsLoading(false);
-        // }
-        // } else window.scrollTo(0, 0);
+            if (data === "ERROR") {
+            throw new Error(
+                "Terjadi kesalahan: Gagal mendaftar."
+            );
+            } else {
+            SweetAlert("Sukses", "Berhasil mendaftar!", "success");
+            // onChangePage("index");
+            }
+        } catch (error) {
+            window.scrollTo(0, 0);
+            setIsError((prevError) => ({
+            ...prevError,
+            error: true,
+            message: error.message,
+            }));
+        } finally {
+            setIsLoading(false);
+        }
+        } else window.scrollTo(0, 0);
     };
+
+    useEffect(() => {
+        formDataRef.current.tujuanPengiriman = selectedAlamat;
+    }, [selectedAlamat]);
 
     return(
         <>
-        <div className="custom-container">
-            {/* {isError.error && (
-                <div className="flex-fill">
-                    <Alert type="danger" message="Error" />
+        <div className="custom-container mt-5">
+        {isLoading ? (
+            <Loading />
+        ) : (
+            <div className="card mt-5">
+                <div className="card-header d-flex justify-content-between align-items-center">
+                    <h2 className="add-title">Formulir Pendaftaran</h2>
+                    <button className="btn btn-info" onClick={() => console.log("Current formDataRef:", formDataRef.current)}>Check</button>
                 </div>
-            )} */}
-            <div className="card mt-3">
-                <div className="card-header"><h2 className="add-title">Formulir Pendaftaran</h2></div>
+                        {isError.error && (
+                            <div className="flex-fill">
+                              <Alert type="danger mt-3" message={isError.message} />
+                            </div>
+                        )}
                 <div className="card-body">
                     <form onSubmit={handleAdd}> 
                     <div className="card">
@@ -621,7 +652,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     value={formDataRef.current.emailKantor}
                                                     onChange={handleInputChange}
                                                     errorMessage={errors.emailKantor}
-                                                    isRequired
                                                 />
                                             </div>
 
@@ -634,7 +664,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     value={formDataRef.current.alamatKantor}
                                                     onChange={handleInputChange}
                                                     errorMessage={errors.alamatKantor}
-                                                    isRequired
                                                 />
                                             </div>
 
@@ -647,7 +676,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     value={formDataRef.current.kodeposKantor}
                                                     onChange={handleInputChange}
                                                     errorMessage={errors.kodeposKantor}
-                                                    isRequired
                                                 />
                                             </div>
                                         </div>
@@ -668,7 +696,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     value={formDataRef.current.hpKantor}
                                                     onChange={handleInputChange}
                                                     errorMessage={errors.hpKantor}
-                                                    isRequired
                                                 />
                                             </div>
 
@@ -714,7 +741,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     value={formDataRef.current.kontakDarurat}
                                                     onChange={handleInputChange}
                                                     errorMessage={errors.kontakDarurat}
-                                                    isRequired
                                                 />
                                             </div>
 
@@ -727,7 +753,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     value={formDataRef.current.namaDarurat}
                                                     onChange={handleInputChange}
                                                     errorMessage={errors.namaDarurat}
-                                                    isRequired
                                                 />
                                             </div>
 
@@ -740,7 +765,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     type="text"
                                                     onChange={handleInputChange}
                                                     errorMessage={errors.hubunganDarurat}
-                                                    isRequired
                                                 />
                                             </div>
                                         </div>
@@ -863,63 +887,90 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                         </div>
 
                         <div className="card mt-3">
-                            <div className="card-header"><h5>Berkas</h5></div>
+                            <div className="card-header d-flex justify-content-between align-items-center">
+                                <h5>Berkas</h5>
+                                <Button
+                                    classType="success"
+                                    label="Unggah Sertifikat" 
+                                    iconName="upload"
+                                    onClick={addFileUpload}
+                                />
+                            </div>
                             <div className="card-body">
+
+                            <label className="form-label fw-bold">Scan Sertifikat (.pdf, .jpg, .png)</label>
+                                <table className="table table-bordered table-striped text-center">
+                                    <thead>
+                                        <tr>
+                                        <th style={{ width: "10%" }}>No.</th>
+                                        <th style={{ width: "80%" }}>Sertifikat</th>
+                                        <th style={{ width: "10%" }}>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {sertifikatFiles.length > 0 ? (
+                                        sertifikatFiles.map((file, index) => (
+                                        <tr key={file.id}>
+                                            <td>{index + 1}</td>
+                                                <td>
+                                                    <input
+                                                        forInput="fileSertifikat"
+                                                        type="file"
+                                                        className="form-control"
+                                                        accept=".pdf,.jpg,.png"
+                                                        ref={file.ref}
+                                                        onChange={() =>
+                                                            handleFileChange(file.ref, "pdf,jpg,png")
+                                                        }
+                                                        required
+                                                    />
+                                                </td>
+                                            <td>
+                                            <Icon
+                                                name="cross"
+                                                type="Bold"
+                                                cssClass="btn px-1 py-0 text-danger"
+                                                onClick={() => removeFileUpload(file.id)}
+                                            />
+                                            </td>
+                                        </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="3" className="text-muted py-3">
+                                                <i className="fas fa-info-circle"></i> Tidak ada sertifikat.
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </tbody>
+                                </table>
+                                
+                                
                                 <div className="row">
                                     <div className="col-md-6">
-                                        <FileUpload
-                                            label="Scan Ijazah Pendidikan Terakhir (.pdf, .jpg, .png)"
-                                            formatFile=".pdf,.jpg,.png"
-                                            isRequired
+                                        <FileUpload 
+                                            forInput="fileIjazah"
+                                            label="Scan Ijazah (.pdf, .jpg, .png)" 
+                                            ref={ijazahRef}
+                                            formatFile=".pdf,.jpg,.png" 
+                                            isRequired 
+                                            onChange={() => 
+                                                handleFileChange(ijazahRef, "pdf,jpg,png")
+                                            }
+                                            errorMessage={errors.fileIjazah}
                                         />
                                     </div>
-
                                     <div className="col-md-6">
                                         <FileUpload
+                                            forInput="fileKtp"
                                             label="Scan KTP (.pdf, .jpg, .png)"
+                                            ref={ktpRef}
                                             formatFile=".pdf,.jpg,.png"
+                                            onChange={() => 
+                                                handleFileChange(ktpRef, "pdf,jpg,png")
+                                            }
                                             isRequired
-                                        />
-                                    </div>
-                                </div>
-
-
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <FileUpload
-                                            ref={fileSertifikatRef1}
-                                            label="Scan Bukti Sertifikat Pelatihan 1 (.pdf, .jpg, .png)"
-                                            formatFile=".pdf,.jpg,.png"
-                                            isRequired
-                                        />
-                                    </div>
-
-                                    <div className="col-md-6">
-                                        <FileUpload
-                                            ref={fileSertifikatRef2}
-                                            label="Scan Bukti Sertifikat Pelatihan 2 (.pdf, .jpg, .png)"
-                                            formatFile=".pdf,.jpg,.png"
-                                            isRequired
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <FileUpload
-                                            ref={fileSertifikatRef3}
-                                            label="Scan Bukti Sertifikat Pelatihan 3 (.pdf, .jpg, .png)"
-                                            formatFile=".pdf,.jpg,.png"
-                                            isRequired
-                                        />
-                                    </div>
-
-                                    <div className="col-md-6">
-                                        <FileUpload
-                                            ref={fileSertifikatRef4}
-                                            label="Scan Bukti Sertifikat Pelatihan 4 (.pdf, .jpg, .png)"
-                                            formatFile=".pdf,.jpg,.png"
-                                            isRequired
+                                            errorMessage={errors.fileKtp}
                                         />
                                     </div>
                                 </div>
@@ -931,52 +982,14 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                             <h5>Riwayat Pekerjaan</h5>
                             <Button
                                 classType="success"
-                                label="Tambah"
+                                label="Tambah Riwayat"
                                 iconName="plus"
                                 onClick={handleTambahClick}
                             />
                         </div>
                             <div className="card-body">
-                                <table className="table table-bordered table-striped text-center">
-                                    <thead>
-                                        <tr>
-                                            <th>No.</th>
-                                            <th>Nama Perusahaan</th>
-                                            <th>Jabatan</th>
-                                            <th>Periode</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {records.length > 0 ? (
-                                        records.map((record, index) => (
-                                            <tr key={record.id}>
-                                                <td>{index + 1}</td>
-                                                <td>{record.perusahaan}</td>
-                                                <td>{record.jabatan}</td>
-                                                <td>{record.periode}</td>
-                                                <td>
-                                                    <Icon
-                                                        name="cross"
-                                                        type="Bold"
-                                                        cssClass="btn px-1 py-0 text-danger"
-                                                        onClick={() => handleDeleteClick(record.id)}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="5" className="text-muted py-3">
-                                                <i className="fas fa-info-circle"></i> Tidak ada data riwayat pekerjaan.
-                                            </td>
-                                        </tr>
-                                    )}
-                                    </tbody>
-                                </table>
-
                                 {isFormVisible && (
-                                    <div className="card mt-3">
+                                    <div className="card">
                                         <div className="card-header">
                                         <h5>Tambah Riwayat Pekerjaan</h5>
                                         </div>
@@ -1017,45 +1030,82 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
                                         <div className="row">
                                             <div className="col-md-6">
-                                            <Input
-                                                label="Periode Mulai"
-                                                type="text"
-                                                name="periodeMulai"
-                                                placeholder="Masukkan Periode Mulai (20xx)"
-                                                value={formRiwayatPekerjaan.periodeMulai}
-                                                onChange={handleInputRiwayat}
-                                            />
+                                                <Input
+                                                    label="Periode Mulai"
+                                                    type="text"
+                                                    name="periodeMulai"
+                                                    placeholder="Masukkan Periode Mulai (20xx)"
+                                                    value={formRiwayatPekerjaan.periodeMulai}
+                                                    onChange={handleInputRiwayat}
+                                                />
                                             </div>
 
                                             <div className="col-md-6">
-                                            <Input
-                                                label="Periode Selesai"
-                                                type="text"
-                                                name="periodeAkhir"
-                                                placeholder="Masukkan Periode Akhir (20xx)"
-                                                value={formRiwayatPekerjaan.periodeAkhir}
-                                                onChange={handleInputRiwayat}
-                                            />
+                                                <Input
+                                                    label="Periode Selesai"
+                                                    type="text"
+                                                    name="periodeAkhir"
+                                                    placeholder="Masukkan Periode Akhir (20xx)"
+                                                    value={formRiwayatPekerjaan.periodeAkhir}
+                                                    onChange={handleInputRiwayat}
+                                                />
                                             </div>
                                         </div>
 
                                         <div className="d-flex justify-content-end gap-2">
                                             <Button
-                                            classType="secondary mt-3"
-                                            label="Batal"
-                                            iconName="cross"
-                                            onClick={handleBatalClick}
+                                                classType="secondary mt-3"
+                                                label="Batal"
+                                                iconName="cross"
+                                                onClick={handleBatalClick}
                                             />
                                             <Button
-                                            classType="primary mt-3"
-                                            label="Simpan"
-                                            iconName="check"
-                                            onClick={handleSimpanClick}
+                                                classType="primary mt-3"
+                                                label="Simpan"
+                                                iconName="check"
+                                                onClick={handleSimpanClick}
                                             />
                                         </div>
                                         </div>
                                     </div>
+                                )}
+                                <table className={`table table-bordered table-striped text-center ${isFormVisible ? "mt-3" : ""}`}>
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Nama Perusahaan</th>
+                                            <th>Jabatan</th>
+                                            <th>Periode</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {records.length > 0 ? (
+                                        records.map((record, index) => (
+                                            <tr key={record.id}>
+                                                <td>{index + 1}</td>
+                                                <td>{record.perusahaan}</td>
+                                                <td>{record.jabatan}</td>
+                                                <td>{record.periode}</td>
+                                                <td>
+                                                    <Icon
+                                                        name="cross"
+                                                        type="Bold"
+                                                        cssClass="btn px-1 py-0 text-danger"
+                                                        onClick={() => handleDeleteClick(record.id)}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="text-muted py-3">
+                                                <i className="fas fa-info-circle"></i> Tidak ada data riwayat pekerjaan.
+                                            </td>
+                                        </tr>
                                     )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
@@ -1066,19 +1116,33 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label fw-bold">Apabila kami ada pengiriman dokumen/materi pembelajaran. Alamat mana yang anda pilih untuk pengiriman tersebut<span className="text-danger">*</span></label>
                                         <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="d-flex align-items-center gap-2">
-                                            <input type="radio" className="form-check-input" name="checkAlamat" value="Rumah" />
-                                            <label className="form-check-label">Rumah</label>
+                                            <div className="col-md-6">
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <input
+                                                        type="radio"
+                                                        className="form-check-input"
+                                                        name="checkAlamat"
+                                                        value="Rumah"
+                                                        checked={formDataRef.current.tujuanPengiriman === "Rumah"}
+                                                        onChange={handleRadioChange}
+                                                    />
+                                                    <label className="form-check-label">Rumah</label>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <input
+                                                        type="radio"
+                                                        className="form-check-input"
+                                                        name="checkAlamat"
+                                                        value="Kantor"
+                                                        checked={formDataRef.current.tujuanPengiriman === "Kantor"}
+                                                        onChange={handleRadioChange}
+                                                    />
+                                                    <label className="form-check-label">Kantor</label>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="d-flex align-items-center gap-2">
-                                            <input type="radio" className="form-check-input" name="checkAlamat" value="Kantor" />
-                                            <label className="form-check-label">Kantor</label>
-                                        </div>
-                                        </div>
-                                    </div>
                                     </div>
 
                                     <div className="col-md-6 mb-3">
@@ -1086,7 +1150,12 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                         <div className="row">
                                             <div className="col-md-12">
                                                 <div className="d-flex align-items-center gap-2">
-                                                    <input className="form-check-input" type="checkbox" />
+                                                    <input 
+                                                        className="form-check-input"
+                                                        type="checkbox" 
+                                                        checked={isChecked}
+                                                        onChange={(e) => setIsChecked(e.target.checked)}
+                                                     />
                                                     <label className="form-check-label">Ya</label>
                                                 </div>
                                             </div>
@@ -1096,16 +1165,16 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                             </div>
                         </div>
 
-                            <Button
-                                    classType="primary float-end mt-3"
-                                    label="Daftar"
-                                    iconName="add"
-                                    type="submit"
-                                    // onClick={() => onChangePage("index")}
-                                />
+                        <Button
+                            classType="primary float-end mt-3"
+                            label="Daftar"
+                            iconName="add"
+                            type="submit"
+                        />
                     </form>
                 </div>
             </div>
+        )}
         </div>
     </>
     );
