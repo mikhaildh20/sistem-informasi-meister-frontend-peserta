@@ -310,70 +310,80 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         document.getElementById("photoInput").click();
     };
 
-    const handleAdd = async (e) => {
+    const handleStoreData = async () => {
+        const validationErrors = await validateAllInputs(
+            formDataRef.current,
+            userSchema,
+            setErrors
+        );
+
+        if (Object.values(validationErrors).every((error) => !error)) {
+            setIsLoading(true);
+            setIsError((prevError) => ({ ...prevError, error: false }));
+            setErrors({});
+
+            // const uploadPromises = [];
+
+            // if (photoRef.current?.files.length > 0 || sertifikatFiles.some((file) => file.ref.current?.files.length > 0)) 
+            // {
+            //     uploadPromises.push(UploadFile(photoRef.current));
+            //     const sertifikatUploads = sertifikatFiles
+            //     .filter((file) => file.ref.current?.files.length > 0)
+            //     .map((file) => UploadFile(file.ref.current));
+        
+            //     uploadPromises.push(...sertifikatUploads);
+            // }
+
+
+
+            try {
+                // await Promise.all(uploadPromises);
+                // formDataRef.current["fotoPeserta"] = uploadedData[0]?.FotoPeserta || "";
+                // formDataRef.current["fileSertifikat"] = uploadedData.slice(1).map((data) => data.SertifikatPeserta) || [];
+
+                const data = await UseFetch(
+                API_LINK + "PendaftaranPeserta/CreatePendaftaranPeserta",
+                formDataRef.current
+                );
+
+                if (data === "ERROR") {
+                throw new Error(
+                    "Terjadi kesalahan: Gagal mendaftar."
+                );
+                } else {
+                SweetAlert("Sukses", "Berhasil mendaftar!", "success");
+                // onChangePage("index");
+                }
+            } catch (error) {
+                window.scrollTo(0, 0);
+                setIsError((prevError) => ({
+                ...prevError,
+                error: true,
+                message: error.message,
+                }));
+            } finally {
+                setIsLoading(false);
+            }
+        } else window.scrollTo(0, 0);
+    }
+
+    const handleAdd = (e) => {
         e.preventDefault();
 
         if (!isChecked) {
             SweetAlert("Peringatan", "Tolong centang data pernyataaan!", "warning");
             return;
-          }
-
-        const validationErrors = await validateAllInputs(
-        formDataRef.current,
-        userSchema,
-        setErrors
-        );
-        
-        console.log(validationErrors);
-
-        if (Object.values(validationErrors).every((error) => !error)) {
-        setIsLoading(true);
-        setIsError((prevError) => ({ ...prevError, error: false }));
-        setErrors({});
-
-        // const uploadPromises = [];
-
-        // if (photoRef.current?.files.length > 0 || sertifikatFiles.some((file) => file.ref.current?.files.length > 0)) 
-        // {
-        //     uploadPromises.push(UploadFile(photoRef.current));
-        //     const sertifikatUploads = sertifikatFiles
-        //     .filter((file) => file.ref.current?.files.length > 0)
-        //     .map((file) => UploadFile(file.ref.current));
-    
-        //     uploadPromises.push(...sertifikatUploads);
-        // }
-
-
-
-        try {
-            // await Promise.all(uploadPromises);
-            // formDataRef.current["fotoPeserta"] = uploadedData[0]?.FotoPeserta || "";
-            // formDataRef.current["fileSertifikat"] = uploadedData.slice(1).map((data) => data.SertifikatPeserta) || [];
-
-            const data = await UseFetch(
-            API_LINK + "PendaftaranPeserta/CreatePendaftaranPeserta",
-            formDataRef.current
-            );
-
-            if (data === "ERROR") {
-            throw new Error(
-                "Terjadi kesalahan: Gagal mendaftar."
-            );
-            } else {
-            SweetAlert("Sukses", "Berhasil mendaftar!", "success");
-            // onChangePage("index");
-            }
-        } catch (error) {
-            window.scrollTo(0, 0);
-            setIsError((prevError) => ({
-            ...prevError,
-            error: true,
-            message: error.message,
-            }));
-        } finally {
-            setIsLoading(false);
         }
-        } else window.scrollTo(0, 0);
+
+        SweetAlert("Konfirmasi", "Yakin untuk mendaftar? pastikan data diisi dengan benar", "warning", "Ya, Daftar")
+        .then((result) => {
+            if (!result) {
+                return;
+            }
+
+            handleStoreData();
+            
+        });
     };
 
     useEffect(() => {

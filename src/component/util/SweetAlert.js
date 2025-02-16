@@ -37,6 +37,7 @@ const SweetAlert = (
         confirm: {
           text: confirmText,
           value: true,
+          className: "swal-confirm-btn",
         },
       },
       dangerMode: icon === "warning",

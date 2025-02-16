@@ -327,3 +327,8 @@ footer {
     font-size: 12px;
   }
 }
+
+.swal-confirm-btn {
+  background-color: #008f21 !important;
+  color: white !important;
+}
