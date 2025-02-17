@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { API_LINK, APPLICATION_ID, ROOT_LINK } from "../util/Constants";
 import logo from "../../assets/IMG_Logo.png";
+import { useNavigate } from "react-router-dom";
+
 
 const Header = () => {
+  const navigate = useNavigate();  
 
-  const handleDaftar = () => {
-    localStorage.removeItem("activeMenu");
-    window.location.href = ROOT_LINK + "/" + "daftar"; 
-  };
   return (
     <div>
       <nav>
@@ -34,7 +33,7 @@ const Header = () => {
                 borderRadius: "12px",
                 transition: "background-color 0.3s",
               }}
-              onClick={handleDaftar} 
+              onClick={() => navigate("/daftar")}
             >
               Daftar
             </button>

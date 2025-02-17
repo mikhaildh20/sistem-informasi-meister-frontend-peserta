@@ -5,23 +5,20 @@ import CreateMenu from "./component/util/CreateMenu";
 import CreateRoute from "./component/util/CreateRoute.jsx";
 
 import Navbar from "./component/backbone/Header";
-import Form from "./component/page/pendaftaran-peserta/Add";
-import Content from "./component/page/pendaftaran-peserta/Root"
+import Form from "./component/page/pendaftaran-peserta/Add.jsx";
+import Beranda from "./component/page/pendaftaran-peserta/Index.jsx";
 import Footer from "./component/backbone/Footer";
 
 
 export default function App() {
   return (
-    <>
-    <div>
-      <Navbar />  
-    </div>
-    <div>
-      <Content /> 
-    </div>
-    <div>
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Beranda />} />
+        <Route path="/daftar" element={<Form />} />
+      </Routes>
       <Footer />
-    </div>
-    </>
+    </BrowserRouter>
   );
 }

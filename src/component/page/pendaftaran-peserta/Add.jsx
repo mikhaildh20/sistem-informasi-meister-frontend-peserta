@@ -108,7 +108,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         fileIjazah: "",
         fileKtp: "",
         fileSertifikat: "",
-        tujuanPengiriman: "Rumah",
+        tujuanPengiriman: "",
     });
 
     const userSchema = object({
@@ -181,10 +181,10 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
     
     const addFileUpload = () => {
         setSertifikatFiles((prevFiles) => [
-          ...prevFiles,
-          { id: Date.now(), ref: null }, // Temporarily store `null` for the ref
+            ...prevFiles,
+            { id: Date.now(), ref: null }, // Temporarily store `null` for the ref
         ]);
-      };
+    };
 
     const removeFileUpload = (id) => {
         setSertifikatFiles(sertifikatFiles.filter((file) => file.id !== id));
@@ -310,6 +310,14 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         document.getElementById("photoInput").click();
     };
 
+    const uploadFileIfExists = async (inputRef, key, folder) => {
+        if (inputRef.current.files.length > 0) {
+            return UploadFile(inputRef.current, folder)
+                .then((data) => (formDataRef.current[key] = data))
+                .catch(() => (formDataRef.current[key] = "ERROR"));
+        }
+    };
+
     const handleStoreData = async () => {
         const validationErrors = await validateAllInputs(
             formDataRef.current,
@@ -322,7 +330,35 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
             setIsError((prevError) => ({ ...prevError, error: false }));
             setErrors({});
 
-            // const uploadPromises = [];
+            const uploadPromises = [
+                uploadFileIfExists(photoRef, "fotoPeserta", "PasPhoto"),
+                uploadFileIfExists(ijazahRef, "fileIjazah", "Ijazah"),
+                uploadFileIfExists(ktpRef, "fileKtp", "Ktp")
+            ];
+
+            // if (photoRef.current.files.length > 0) {
+            //     uploadPromises.push(
+            //     UploadFile(photoRef.current).then(
+            //         (data) => (formDataRef.current["fotoPeserta"] = data.Hasil)
+            //     )
+            //     );
+            // }
+
+            // if (ijazahRef.current.files.length > 0) {
+            //     uploadPromises.push(
+            //     UploadFile(ijazahRef.current).then(
+            //         (data) => (formDataRef.current["fileIjazah"] = data.Hasil)
+            //     )
+            //     );
+            // }
+
+            // if (ktpRef.current.files.length > 0) {
+            //     uploadPromises.push(
+            //     UploadFile(ktpRef.current).then(
+            //         (data) => (formDataRef.current["fileKtp"] = data.Hasil)
+            //     )
+            //     );
+            // }
 
             // if (photoRef.current?.files.length > 0 || sertifikatFiles.some((file) => file.ref.current?.files.length > 0)) 
             // {
@@ -337,14 +373,14 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
 
             try {
-                // await Promise.all(uploadPromises);
-                // formDataRef.current["fotoPeserta"] = uploadedData[0]?.FotoPeserta || "";
-                // formDataRef.current["fileSertifikat"] = uploadedData.slice(1).map((data) => data.SertifikatPeserta) || [];
+                await Promise.all(uploadPromises);
 
                 const data = await UseFetch(
                 API_LINK + "PendaftaranPeserta/CreatePendaftaranPeserta",
                 formDataRef.current
                 );
+
+                console.log(data);
 
                 if (data === "ERROR") {
                 throw new Error(
@@ -403,7 +439,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                 </div>
                         {isError.error && (
                             <div className="flex-fill">
-                              <Alert type="danger mt-3" message={isError.message} />
+                                <Alert type="danger mt-3" message={isError.message} />
                             </div>
                         )}
                 <div className="card-body">
