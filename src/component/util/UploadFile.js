@@ -6,54 +6,48 @@ const UploadFile = async (fileInput, type = "single", folder = "Uploads") => {
 
   const data = new FormData();
 
-  if (type === "single") {
-    // Upload Single File
-    if (fileInput.files.length > 0) {
-      // console.log("Uploading single file:", fileInput.files[0]); // Debugging
-      data.append("file", fileInput.files[0]);
-    } else {
-      return "ERROR";
-    }
+  if (type === "multiple") {
+      const files = fileInput.files || [];
+      if (files.length === 0) return "ERROR";
 
-    try {
-      const response = await fetch(`${API_LINK}Upload/UploadFile?folder=${folder}`, {
-        method: "POST",
-        body: data,
+      // Ubah FileList menjadi array lalu iterasi
+      Array.from(files).forEach((file) => {
+          data.append("files", file);
       });
 
-      const result = await response.json();
-      // console.log("Response dari API (Single Upload):", result);
+      try {
+          const response = await fetch(`${API_LINK}Upload/UploadMultipleFiles?folder=${folder}`, {
+              method: "POST",
+              body: data,
+          });
 
-      return response.ok ? result.hasil : "ERROR";
-    } catch (err) {
-      return "ERROR";
-    }
-  } 
-  
-  else if (type === "multiple") {
-    // Upload Multiple Files
-    if (fileInput.length === 0) return "ERROR";
-
-    console.log("Uploading multiple files:", fileInput); // Debugging
-    Array.from(fileInput).forEach((file) => data.append("files", file.ref.current.files));
-
-    try {
-      const response = await fetch(`${API_LINK}Upload/UploadMultipleFiles?folder=${folder}`, {
-        method: "POST",
-        body: data,
-      });
-
-      const result = await response.json();
-      console.log("Response dari API (Multiple Upload):", result);
-
-      return response.ok ? result.hasil : "ERROR";
-    } catch (err) {
-      console.error("Error upload multiple files:", err);
-      return "ERROR";
-    }
+          const result = await response.json();
+          
+          return response.ok ? result.hasil : "ERROR";
+      } catch (err) {
+          console.log("Error upload multiple files:", err);
+          return "ERROR";
+      }
   }
 
-  return "ERROR";
+  // Untuk single upload
+  if (fileInput.files.length === 0) return "ERROR";
+
+  data.append("file", fileInput.files[0]);
+
+  try {
+      const response = await fetch(`${API_LINK}Upload/UploadFile?folder=${folder}`, {
+          method: "POST",
+          body: data,
+      });
+
+      const result = await response.json();
+
+      return response.ok ? result.hasil : "ERROR";
+  } catch (err) {
+      console.error("Error upload:", err);
+      return "ERROR";
+  }
 };
 
 

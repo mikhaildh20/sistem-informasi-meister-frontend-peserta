@@ -13,7 +13,6 @@ import UploadFile from "../../util/UploadFile";
 import Alert from "../../part/Alert";
 import SweetAlert from "../../util/SweetAlert";
 import Loading from "../../part/Loading";
-import Label from "../../part/Label";
 
 const listJenisKelamin = [
     {Value: "Laki-laki", Text: "Laki-laki"},
@@ -157,7 +156,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
     const [sertifikatFiles, setSertifikatFiles] = useState([]);
     const [photo, setPhoto] = useState(blank);
     const [records, setRecords] = useState([]);
-    const [selectedAlamat, setSelectedAlamat] = useState(formDataRef.current.tujuanPengiriman);
+    const [selectedAlamat, setSelectedAlamat] = useState();
     const photoRef = useRef(null);
     const ijazahRef = useRef(null);
     const ktpRef = useRef(null);
@@ -182,7 +181,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
     const addFileUpload = () => {
         setSertifikatFiles((prevFiles) => [
             ...prevFiles,
-            { id: Date.now(), ref: React.createRef() }, // Temporarily store `null` for the ref
+            { id: Date.now(), ref: React.createRef() },
         ]);
     };
 
@@ -302,7 +301,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         const value = e.target.value;
         setSelectedAlamat(value);
         formDataRef.current.tujuanPengiriman = value;
-        console.log("Selected:", formDataRef.current.tujuanPengiriman);
     };
     
 
@@ -311,12 +309,30 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
     };
 
     const uploadFileIfExists = async (inputRef, key, folder, type) => {
-        if (inputRef.current.files.length > 0) {
-            return UploadFile(inputRef.current, type,folder)
-                .then((data) => (formDataRef.current[key] = data))
-                .catch(() => (formDataRef.current[key] = "ERROR"));
-        }
+        if (type === "multiple") {
+            if (inputRef.length > 0) { 
+                const fileUploadPromises = inputRef.map(fileObj => {
+                    if (fileObj.ref.current?.files.length > 0) {
+                        return UploadFile(fileObj.ref.current, type, folder);
+                    }
+                    return Promise.resolve("");
+                });
+    
+                return Promise.all(fileUploadPromises)
+                    .then((results) => {
+                        formDataRef.current[key] = results.filter(name => name !== "").join(",");
+                    })
+                    .catch(() => (formDataRef.current[key] = "ERROR"));
+            }
+        } else {
+            if (inputRef.current?.files.length > 0) {
+                return UploadFile(inputRef.current, type, folder)
+                    .then((data) => (formDataRef.current[key] = data))
+                    .catch(() => (formDataRef.current[key] = "ERROR"));
+            }
+        }    
     };
+    
 
     const handleStoreData = async () => {
         const validationErrors = await validateAllInputs(
@@ -354,7 +370,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                 );
                 } else {
                 SweetAlert("Sukses", "Berhasil mendaftar!", "success");
-                // onChangePage("index");
+                onChangePage("index");
                 }
             } catch (error) {
                 window.scrollTo(0, 0);
@@ -387,11 +403,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
             
         });
     };
-
-    useEffect(() => {
-        formDataRef.current.tujuanPengiriman = selectedAlamat;
-        console.log("Sertifikat Files:", sertifikatFiles);
-    }, [selectedAlamat,sertifikatFiles]);
 
     return(
         <>
