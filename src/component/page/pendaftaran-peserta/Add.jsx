@@ -182,7 +182,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
     const addFileUpload = () => {
         setSertifikatFiles((prevFiles) => [
             ...prevFiles,
-            { id: Date.now(), ref: null }, // Temporarily store `null` for the ref
+            { id: Date.now(), ref: React.createRef() }, // Temporarily store `null` for the ref
         ]);
     };
 
@@ -310,9 +310,9 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         document.getElementById("photoInput").click();
     };
 
-    const uploadFileIfExists = async (inputRef, key, folder) => {
+    const uploadFileIfExists = async (inputRef, key, folder, type) => {
         if (inputRef.current.files.length > 0) {
-            return UploadFile(inputRef.current, folder)
+            return UploadFile(inputRef.current, type,folder)
                 .then((data) => (formDataRef.current[key] = data))
                 .catch(() => (formDataRef.current[key] = "ERROR"));
         }
@@ -331,45 +331,11 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
             setErrors({});
 
             const uploadPromises = [
-                uploadFileIfExists(photoRef, "fotoPeserta", "PasPhoto"),
-                uploadFileIfExists(ijazahRef, "fileIjazah", "Ijazah"),
-                uploadFileIfExists(ktpRef, "fileKtp", "Ktp")
+                uploadFileIfExists(photoRef, "fotoPeserta", "PasPhoto", "single"),
+                uploadFileIfExists(ijazahRef, "fileIjazah", "Ijazah", "single"),
+                uploadFileIfExists(ktpRef, "fileKtp", "Ktp", "single"),
+                uploadFileIfExists(sertifikatFiles,"fileSertifikat","Sertifikat","multiple")
             ];
-
-            // if (photoRef.current.files.length > 0) {
-            //     uploadPromises.push(
-            //     UploadFile(photoRef.current).then(
-            //         (data) => (formDataRef.current["fotoPeserta"] = data.Hasil)
-            //     )
-            //     );
-            // }
-
-            // if (ijazahRef.current.files.length > 0) {
-            //     uploadPromises.push(
-            //     UploadFile(ijazahRef.current).then(
-            //         (data) => (formDataRef.current["fileIjazah"] = data.Hasil)
-            //     )
-            //     );
-            // }
-
-            // if (ktpRef.current.files.length > 0) {
-            //     uploadPromises.push(
-            //     UploadFile(ktpRef.current).then(
-            //         (data) => (formDataRef.current["fileKtp"] = data.Hasil)
-            //     )
-            //     );
-            // }
-
-            // if (photoRef.current?.files.length > 0 || sertifikatFiles.some((file) => file.ref.current?.files.length > 0)) 
-            // {
-            //     uploadPromises.push(UploadFile(photoRef.current));
-            //     const sertifikatUploads = sertifikatFiles
-            //     .filter((file) => file.ref.current?.files.length > 0)
-            //     .map((file) => UploadFile(file.ref.current));
-        
-            //     uploadPromises.push(...sertifikatUploads);
-            // }
-
 
 
             try {
@@ -424,7 +390,8 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
     useEffect(() => {
         formDataRef.current.tujuanPengiriman = selectedAlamat;
-    }, [selectedAlamat]);
+        console.log("Sertifikat Files:", sertifikatFiles);
+    }, [selectedAlamat,sertifikatFiles]);
 
     return(
         <>
@@ -437,16 +404,20 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                     <h2 className="add-title">Formulir Pendaftaran</h2>
                     <button className="btn btn-info" onClick={() => console.log("Current formDataRef:", formDataRef.current)}>Check</button>
                 </div>
-                        {isError.error && (
-                            <div className="flex-fill">
-                                <Alert type="danger mt-3" message={isError.message} />
-                            </div>
-                        )}
                 <div className="card-body">
                     <form onSubmit={handleAdd}> 
                     <div className="card">
                     <div className="card-header"><h5>Data Pribadi</h5></div>
                         <div className="card-body">
+                        {isError.error && (
+                            <div className="row d-flex justify-content-center align-items-center">
+                                <div className="col-md-12 text-center">
+                                    <div className="flex-fill">
+                                        <Alert type="danger mt-3" message={isError.message} />
+                                    </div>
+                                </div>
+                            </div>                        
+                        )}
                                 <div className="row">
                                 <div className="col-md-4">
                                     <label className="form-label fw-bold">Pas Foto</label>
@@ -960,7 +931,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                             <td>{index + 1}</td>
                                                 <td>
                                                     <input
-                                                        forInput="fileSertifikat"
                                                         type="file"
                                                         className="form-control"
                                                         accept=".pdf,.jpg,.png"

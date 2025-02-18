@@ -4,11 +4,8 @@ import mahasiswa from "../../../assets/mahasiswa.png";
 import KampusMerdeka from "../../../assets/KampusMerdeka.png";
 import SatuMerdeka from "../../../assets/SatuMerdeka.png";
 import ASTRAtech from "../../../assets/ASTRAtech.png";
-import iconAstra from "../../../assets/iconAstra.png";
-import { useNavigate } from "react-router-dom";
 
-export default function BerandaIndex() {
-    const navigate = useNavigate();  
+export default function BerandaIndex({onChangePage}) {
 
     return (
         <div className="meister-container">
@@ -19,7 +16,7 @@ export default function BerandaIndex() {
             <p>
                 Dapatkan sertifikasi German Bachelor Professional (Meister) bidang otomotif. Daftar sekarang dan raih sertifikasi internasional pertama di Asia!
             </p>
-            <button onClick={() => navigate("/daftar")}>Daftar Sekarang</button>
+            <button onClick={() => onChangePage("add")}>Daftar Sekarang</button>
             </div>
             <div className="imgDatang">
             <img className="mahasiswa" src={mahasiswa} alt="Ilustrasi Mahasiswa" />

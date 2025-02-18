@@ -1,9 +1,9 @@
 import { useState } from "react";
-// import PendaftaranPesertaMeisterIndex from "./Index";
+import PendaftaranPesertaMeisterIndex from "./Index";
 import PendaftaranPesertaMeisterAdd from "./Add";
 
 export default function PendaftaranPesertaMeister() {
-    const [pageMode, setPageMode] = useState("add");
+    const [pageMode, setPageMode] = useState("index");
 
     function getPageMode() {
         switch (pageMode) {
