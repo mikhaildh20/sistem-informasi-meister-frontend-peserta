@@ -21,8 +21,6 @@ const listJenisKelamin = [
 
 const listProgramMeister = [
     {Value: "1", Text: "Meister Otomotif"},
-    {Value: "2", Text: "Malaysian Meister Program"},
-    {Value: "3", Text: "Advanced Technology Meister Programme (ATMP)"},
 ];
 
 const listGolonganDarah = [
@@ -77,7 +75,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         idProgram: "",
         tempatLahir: "",
         tanggalLahir: "",
-        angkatanPeserta: "",
         jenisKelamin: "",
         alamatPeserta: "",
         kodeposPeserta: "",
@@ -116,21 +113,29 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         .required("harus diisi!"),
         fotoPeserta: string(),
         idProgram: string().required("harus diisi!"),
-        tempatLahir: string().required("harus diisi!"),
+        tempatLahir: string().required("harus diisi!")
+        .max(20,"maksimum 20 karakter")
+        .required("harus diisi!"),
         tanggalLahir: string().required("harus diisi!"),
-        angkatanPeserta: string().required("harus diisi!"),
         jenisKelamin: string().required("harus diisi!"),
-        alamatPeserta: string().required("harus diisi!"),
-        kodeposPeserta: string().required("harus diisi!"),
+        alamatPeserta: string().max(100,"maksimum 100 karakter").required("harus diisi!"),
+        kodeposPeserta: string()
+        .max(5,"maksimum 5 karakter")
+        .min(5,"minimal 5 karakter")
+        .required("harus diisi!"),
         emailPeserta: string().required("harus diisi!"),
-        hpPeserta: string().required("harus diisi!"),
+        hpPeserta: string()
+        .min(11,"minimal 11 karakter")
+        .max(13,"maksimal 13 karakter")
+        .required("harus diisi!"),
         golonganDarah: string().required("harus diisi!"),
         kewarganegaraan: string().required("harus diisi!"),
         agamaPeserta: string().required("harus diisi!"),
         statusPerkawinan: string().required("harus diisi!"),
         emailKantor: string(),
         alamatKantor: string(),
-        kodeposKantor: string(),
+        kodeposKantor: string()
+        .max(5,"maksimum 5 karakter"),
         hpKantor: string(),
         ukuranSepatu: string().required("harus diisi!"),
         ukuranKemeja: string().required("harus diisi!"),
@@ -141,8 +146,8 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         kursusPeserta: string(),
         hobiPeserta: string(),
         pendidikanTerakhir: string().required("harus diisi!"),
-        namaSekolah: string().required("harus diisi!"),
-        tahunLulusSekolah: string().required("harus diisi!"),
+        namaSekolah: string(),
+        tahunLulusSekolah: string(),
         namaPerguruanTinggi: string(),
         tahunLulusPerguruanTinggi: string(),
         fileIjazah: string(),
@@ -153,7 +158,9 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-    const [sertifikatFiles, setSertifikatFiles] = useState([]);
+    const [sertifikatFiles, setSertifikatFiles] = useState([
+        { id: "static", ref: React.createRef(), static: true }
+    ]);
     const [photo, setPhoto] = useState(blank);
     const [records, setRecords] = useState([]);
     const [selectedAlamat, setSelectedAlamat] = useState();
@@ -170,18 +177,34 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        const validationError = validateInput(name, value, userSchema);
+
         formDataRef.current[name] = value;
+
+        if (name === "pendidikanTerakhir") {
+            if (value === "Diploma" || value === "Sarjana") {
+                formDataRef.current.namaSekolah = "";
+                formDataRef.current.tahunLulusSekolah = "";
+            } else {
+                formDataRef.current.namaPerguruanTinggi = "";
+                formDataRef.current.tahunLulusPerguruanTinggi = "";
+            }
+        }
+
+        const validationError = validateInput(name, value, userSchema);
+
         setErrors((prevErrors) => ({
-        ...prevErrors,
-        [validationError.name]: validationError.error,
+            ...prevErrors,
+            [validationError.name]: validationError.error,
         }));
+
+        setFormData({ ...formDataRef.current });
     };
+
     
     const addFileUpload = () => {
         setSertifikatFiles((prevFiles) => [
             ...prevFiles,
-            { id: Date.now(), ref: React.createRef() },
+            { id: Date.now(), ref: React.createRef(), static: false },
         ]);
     };
 
@@ -358,20 +381,40 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                 await Promise.all(uploadPromises);
 
                 const data = await UseFetch(
-                API_LINK + "PendaftaranPeserta/CreatePendaftaranPeserta",
-                formDataRef.current
+                    API_LINK + "PendaftaranPeserta/CreatePendaftaranPeserta",
+                    formDataRef.current
                 );
 
-                console.log(data);
+                if (!data || data.Response === "ERROR") {
+                    throw new Error("Gagal mendaftar. Silakan coba lagi.");
+                }
 
-                if (data === "ERROR") {
-                throw new Error(
-                    "Terjadi kesalahan: Gagal mendaftar."
-                );
-                } else {
+                const idPeserta = data[0].Response; 
+                let isSertifikatSuccess = true;
+                let sertifikatResponses = [];
+
+                if (formDataRef.current["fileSertifikat"]) {
+                    const sertifikatArray = formDataRef.current["fileSertifikat"].split(",");
+
+                    sertifikatResponses = await Promise.all(
+                        sertifikatArray.map(async (fileName) => {
+                            const response = await UseFetch(
+                                API_LINK + "PendaftaranPeserta/CreateDetailSertifikat",
+                                { fileName, idPeserta }
+                            );
+                            return response;
+                        })
+                    );
+
+                    isSertifikatSuccess = sertifikatResponses.every(res => res && res[0].Response !== "ERROR");
+                }
+
+                if (!isSertifikatSuccess) {
+                    throw new Error("Beberapa sertifikat gagal disimpan.");
+                }
+
                 SweetAlert("Sukses", "Berhasil mendaftar!", "success");
                 onChangePage("index");
-                }
             } catch (error) {
                 window.scrollTo(0, 0);
                 setIsError((prevError) => ({
@@ -404,6 +447,13 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
         });
     };
 
+    useEffect(() => {
+        if (!formDataRef.current.alamatKantor && selectedAlamat === "Kantor") {
+            setSelectedAlamat("Rumah");
+            formDataRef.current.tujuanPengiriman = "Rumah";
+        }
+    }, [formDataRef.current.alamatKantor, selectedAlamat]);
+
     return(
         <>
         <div className="custom-container mt-5">
@@ -413,7 +463,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
             <div className="card mt-5">
                 <div className="card-header d-flex justify-content-between align-items-center">
                     <h2 className="add-title">Formulir Pendaftaran</h2>
-                    {/* <button className="btn btn-info" onClick={() => console.log("Current formDataRef:", formDataRef.current)}>Check</button> */}
+                    <button className="btn btn-info" onClick={() => console.log("Current formDataRef:", formDataRef.current)}>Check</button>
                 </div>
                 <div className="card-body">
                     <form onSubmit={handleAdd}> 
@@ -521,19 +571,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                         <div className="row">
 
                                             <div className="col-md-6">
-                                                <Input
-                                                    forInput="angkatanPeserta"
-                                                    label="Angkatan"
-                                                    type="text"
-                                                    placeholder="Masukkan Angkatan (20xx)"
-                                                    value={formDataRef.current.angkatanPeserta}
-                                                    onChange={handleInputChange}
-                                                    errorMessage={errors.angkatanPeserta}
-                                                    isRequired
-                                                />
-                                            </div>
-
-                                            <div className="col-md-6">
                                                 <Dropdown
                                                     forInput="jenisKelamin"
                                                     label="Jenis Kelamin"
@@ -545,14 +582,10 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                 />
                                             </div>
 
-                                        </div>
-
-                                        <div className="row">
-
                                             <div className="col-md-6">
                                                 <Input
                                                     forInput="alamatPeserta"
-                                                    label="Alamat"
+                                                    label="Alamat Domisili"
                                                     type="text"
                                                     placeholder="Masukkan Alamat"
                                                     value={formDataRef.current.alamatPeserta}
@@ -561,6 +594,10 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     isRequired
                                                 />
                                             </div>
+
+                                        </div>
+
+                                        <div className="row">
 
                                             <div className="col-md-6">
                                                 <Input
@@ -575,10 +612,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                 />
                                             </div>
 
-                                        </div>
-
-                                        <div className="row">
-
                                             <div className="col-md-6">
                                                 <Input
                                                     forInput="emailPeserta"
@@ -591,6 +624,12 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     isRequired
                                                 />
                                             </div>
+
+                                        </div>
+
+                                        <div className="row">
+
+                                            
 
                                             <div className="col-md-6">
                                                 <Input
@@ -605,10 +644,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                 />
                                             </div>
 
-                                        </div>
-
-                                        <div className="row">
-
                                             <div className="col-md-6">
                                                 <Dropdown
                                                     forInput="golonganDarah"
@@ -620,6 +655,10 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     isRequired
                                                 />
                                             </div>
+
+                                        </div>
+
+                                        <div className="row">  
 
                                             <div className="col-md-6">
                                                 <Dropdown
@@ -633,10 +672,6 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                 />
                                             </div>
 
-                                        </div>
-
-                                        <div className="row">
-
                                             <div className="col-md-6">
                                                 <Dropdown
                                                     forInput="agamaPeserta"
@@ -649,6 +684,10 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                 />
                                             </div>
 
+                                        </div>
+
+                                        <div className="row">
+                                            
                                             <div className="col-md-6">
                                                 <Dropdown
                                                     forInput="statusPerkawinan"
@@ -658,6 +697,18 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     onChange={handleInputChange}
                                                     errorMessage={errors.statusPerkawinan}
                                                     isRequired
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6">
+                                                <Input
+                                                    forInput="emailKantor"
+                                                    label="Email Perusahaan"
+                                                    type="text"
+                                                    placeholder="Masukkan Email Perusahaan"
+                                                    value={formDataRef.current.emailKantor}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.emailKantor}
                                                 />
                                             </div>
 
@@ -671,17 +722,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
 
                                     <div className="col-md-12">
                                         <div className="row">
-                                            <div className="col-md-4">
-                                                <Input
-                                                    forInput="emailKantor"
-                                                    label="Email Perusahaan"
-                                                    type="text"
-                                                    placeholder="Masukkan Email Perusahaan"
-                                                    value={formDataRef.current.emailKantor}
-                                                    onChange={handleInputChange}
-                                                    errorMessage={errors.emailKantor}
-                                                />
-                                            </div>
+                                            
 
                                             <div className="col-md-4">
                                                 <Input
@@ -706,15 +747,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     errorMessage={errors.kodeposKantor}
                                                 />
                                             </div>
-                                        </div>
-                                    </div>
-                                    
-                                </div>
 
-                                <div className="row">
-
-                                    <div className="col-md-12">
-                                        <div className="row">
                                             <div className="col-md-4">
                                                 <Input
                                                     forInput="hpKantor"
@@ -726,6 +759,16 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     errorMessage={errors.hpKantor}
                                                 />
                                             </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <div className="row">
+
+                                    <div className="col-md-12">
+                                        <div className="row">
+                                            
 
                                             <div className="col-md-4">
                                                 <Input
@@ -751,15 +794,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     isRequired
                                                 />
                                             </div>
-                                        </div>
-                                    </div>
-                                    
-                                </div>
 
-                                <div className="row">
-
-                                    <div className="col-md-12">
-                                        <div className="row">
                                             <div className="col-md-4">
                                                 <Input
                                                     forInput="kontakDarurat"
@@ -771,6 +806,16 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     errorMessage={errors.kontakDarurat}
                                                 />
                                             </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <div className="row">
+
+                                    <div className="col-md-12">
+                                        <div className="row">
+                                            
 
                                             <div className="col-md-4">
                                                 <Input
@@ -795,15 +840,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     errorMessage={errors.hubunganDarurat}
                                                 />
                                             </div>
-                                        </div>
-                                    </div>
-                                    
-                                </div>
 
-                                <div className="row">
-
-                                    <div className="col-md-12">
-                                        <div className="row">
                                             <div className="col-md-4">
                                                 <Input
                                                     forInput="mediaSosial"
@@ -814,6 +851,16 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     type="text"
                                                 />
                                             </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <div className="row">
+
+                                    <div className="col-md-12">
+                                        <div className="row">
+                                            
 
                                             <div className="col-md-4">
                                                 <Input
@@ -847,69 +894,78 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                         <div className="card mt-3">
                             <div className="card-header"><h5>Pendidikan</h5></div>
                             <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-4">
-                                        <Dropdown
-                                            forInput="pendidikanTerakhir"
-                                            label="Pendidikan Terakhir"
-                                            arrData={listPendidikanTerakhir}
-                                            value={formDataRef.current.pendidikanTerakhir}
-                                            onChange={handleInputChange}
-                                            errorMessage={errors.pendidikanTerakhir}
-                                            isRequired
-                                        />
-                                    </div>
-
-                                    <div className="col-md-4">
-                                        <Input
-                                            forInput="namaSekolah"
-                                            label="Nama Sekolah"
-                                            type="text"
-                                            placeholder="Masukkan Nama Sekolah"
-                                            value={formDataRef.current.namaSekolah}
-                                            onChange={handleInputChange}
-                                            errorMessage={errors.namaSekolah}
-                                            isRequired
-                                        />
-                                    </div>
-
-                                    <div className="col-md-4">
-                                        <Input
-                                            forInput="tahunLulusSekolah"
-                                            label="Tahun Lulus Sekolah"
-                                            placeholder="Masukkan Tahun Lulus Sekolah"
-                                            value={formDataRef.current.tahunLulusSekolah}
-                                            type="text"
-                                            onChange={handleInputChange}
-                                            errorMessage={errors.tahunLulusSekolah}
-                                            isRequired
-                                        />
-                                    </div>
+                            <div className="row">
+                                <div className="col-md-4">
+                                    <Dropdown
+                                        forInput="pendidikanTerakhir"
+                                        label="Pendidikan Terakhir"
+                                        arrData={listPendidikanTerakhir}
+                                        value={formDataRef.current.pendidikanTerakhir}
+                                        onChange={handleInputChange}
+                                        errorMessage={errors.pendidikanTerakhir}
+                                        isRequired
+                                    />
                                 </div>
 
+                                {formDataRef.current.pendidikanTerakhir !== "Diploma" &&
+                                    formDataRef.current.pendidikanTerakhir !== "Sarjana" && (
+                                        <>
+                                            <div className="col-md-4">
+                                                <Input
+                                                    forInput="namaSekolah"
+                                                    label="Nama Sekolah"
+                                                    type="text"
+                                                    placeholder="Masukkan Nama Sekolah"
+                                                    value={formDataRef.current.namaSekolah}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.namaSekolah}
+                                                    isRequired
+                                                />
+                                            </div>
+                                            <div className="col-md-4">
+                                                <Input
+                                                    forInput="tahunLulusSekolah"
+                                                    label="Tahun Lulus Sekolah"
+                                                    type="text"
+                                                    placeholder="Masukkan Tahun Lulus Sekolah"
+                                                    value={formDataRef.current.tahunLulusSekolah}
+                                                    onChange={handleInputChange}
+                                                    errorMessage={errors.tahunLulusSekolah}
+                                                    isRequired
+                                                />
+                                            </div>
+                                        </>
+                                    )}
 
-                                <div className="row">
-                                    <div className="col-md-4">
-                                        <Input
-                                            forInput="namaPerguruanTinggi"
-                                            label="Nama Perguruan Tinggi"
-                                            placeholder="Masukkan Nama Perguruan Tinggi"
-                                            value={formDataRef.current.namaPerguruanTinggi}
-                                            onChange={handleInputChange}
-                                            type="text"
-                                        />
-                                    </div>
-
-                                    <div className="col-md-4">
-                                        <Input
-                                            forInput="tahunLulusPerguruanTinggi"
-                                            label="Tahun Lulus Perguruan Tinggi"
-                                            placeholder="Masukkan Tahun Lulus Perguruan Tinggi"
-                                            value={formDataRef.current.tahunLulusPerguruanTinggi}
-                                            onChange={handleInputChange}
-                                            type="text"
-                                        />
-                                    </div>
+                                    {formDataRef.current.pendidikanTerakhir === "Diploma" ||
+                                        formDataRef.current.pendidikanTerakhir === "Sarjana" ? (
+                                            <>
+                                                <div className="col-md-4">
+                                                    <Input
+                                                        forInput="namaPerguruanTinggi"
+                                                        label="Nama Perguruan Tinggi"
+                                                        type="text"
+                                                        placeholder="Masukkan Nama Perguruan Tinggi"
+                                                        value={formDataRef.current.namaPerguruanTinggi}
+                                                        onChange={handleInputChange}
+                                                        errorMessage={errors.namaPerguruanTinggi}
+                                                        isRequired
+                                                    />
+                                                </div>
+                                                <div className="col-md-4">
+                                                    <Input
+                                                        forInput="tahunLulusPerguruanTinggi"
+                                                        label="Tahun Lulus Perguruan Tinggi"
+                                                        type="text"
+                                                        placeholder="Masukkan Tahun Lulus Perguruan Tinggi"
+                                                        value={formDataRef.current.tahunLulusPerguruanTinggi}
+                                                        onChange={handleInputChange}
+                                                        errorMessage={errors.tahunLulusPerguruanTinggi}
+                                                        isRequired
+                                                    />
+                                                </div>
+                                            </>
+                                        ) : null}
                                 </div>
                             </div>
                         </div>
@@ -953,12 +1009,21 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                     />
                                                 </td>
                                             <td>
-                                            <Icon
-                                                name="cross"
-                                                type="Bold"
-                                                cssClass="btn px-1 py-0 text-danger"
-                                                onClick={() => removeFileUpload(file.id)}
-                                            />
+                                            {file.static ? (
+                                                    <Icon
+                                                        name="lock"
+                                                        type="Bold"
+                                                        cssClass="btn px-1 py-0 text-secondary"
+                                                        disabled
+                                                    />
+                                                ) : (
+                                                    <Icon
+                                                        name="cross"
+                                                        type="Bold"
+                                                        cssClass="btn px-1 py-0 text-danger"
+                                                        onClick={() => removeFileUpload(file.id)}
+                                                    />
+                                                )}
                                             </td>
                                         </tr>
                                         ))
@@ -1165,6 +1230,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                         value="Kantor"
                                                         checked={formDataRef.current.tujuanPengiriman === "Kantor"}
                                                         onChange={handleRadioChange}
+                                                        disabled={!formDataRef.current.alamatKantor}
                                                     />
                                                     <label className="form-check-label">Kantor</label>
                                                 </div>
@@ -1182,7 +1248,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                                                         type="checkbox" 
                                                         checked={isChecked}
                                                         onChange={(e) => setIsChecked(e.target.checked)}
-                                                     />
+                                                    />
                                                     <label className="form-check-label">Ya</label>
                                                 </div>
                                             </div>

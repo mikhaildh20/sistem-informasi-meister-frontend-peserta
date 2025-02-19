@@ -1,8 +1,4 @@
-import { useState, useEffect } from "react";
-import { API_LINK, APPLICATION_ID, ROOT_LINK } from "../util/Constants";
 import logo from "../../assets/IMG_Logo.png";
-import { useNavigate } from "react-router-dom";
-
 
 const Header = () => {
   return (
