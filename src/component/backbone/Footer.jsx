@@ -40,7 +40,7 @@ export default function Footer() {
             </div>
         </div>
         <div className="footer-bottom">
-            <strong>Copyright © 2024 - MIS ASTRAtech</strong>
+            <strong>Copyright © 2024 - Mike & Aurelio</strong>
         </div>
         </footer>
     );

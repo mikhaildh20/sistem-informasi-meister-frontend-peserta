@@ -413,7 +413,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
             <div className="card mt-5">
                 <div className="card-header d-flex justify-content-between align-items-center">
                     <h2 className="add-title">Formulir Pendaftaran</h2>
-                    <button className="btn btn-info" onClick={() => console.log("Current formDataRef:", formDataRef.current)}>Check</button>
+                    {/* <button className="btn btn-info" onClick={() => console.log("Current formDataRef:", formDataRef.current)}>Check</button> */}
                 </div>
                 <div className="card-body">
                     <form onSubmit={handleAdd}> 
