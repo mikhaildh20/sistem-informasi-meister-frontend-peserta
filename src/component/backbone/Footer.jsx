@@ -40,8 +40,9 @@ export default function Footer() {
             </div>
         </div>
         <div className="footer-bottom">
-            <strong>Copyright © 2024 - Mike & Aurelio</strong>
-        </div>
+    <strong>Copyright © 2025; Designed by</strong> Aurelio & Mike
+</div>
+
         </footer>
     );
 }

@@ -1,3 +1,9 @@
+:root {
+  --primary-color: rgb(10,94,168);
+  --secondary-color: rgba(8,84,159,1);
+}
+
+
 * {
   font-family: "Barlow";
 }
@@ -218,6 +224,268 @@ nav {
 .add-title{
   color: #0A5EA8;
 }
+
+/* Konten */
+/* General Layout */
+.meister-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Section 1 - Hero */
+.sec1 {
+  background-image: url('../src/assets/bgHero.png');
+  display: flex;
+  width: 100%;
+  margin-top: 55px;
+  padding-left: 8%;
+  padding-right: 8%;
+  background-size: cover;
+  background-color: var(--primary-color);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ucapan {
+  width: 50%;
+  
+  color: white;
+}
+
+.ucapan h3 {
+  color: #FFF;
+  font-size: 1.8rem; /* Use rem for scalability */
+}
+
+.ucapan h1 {
+  font-weight: bold;
+  font-size: 3rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  max-width: 1000px;
+}
+
+.ucapan p {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  max-width: 600px;
+}
+
+.ucapan button {
+  margin-top: 2rem;
+  width: 70%;
+  max-width: 280px;
+  height: 60px;
+  border-radius: 35px;
+  background-color: white;
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.ucapan button:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transition-duration: 0.5s;
+  transform: translateY(-3px);
+}
+
+.imgDatang {
+  /* width: 27%; */
+  display: flex;
+  
+}
+
+.imgDatang img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Partner Logos Section */
+.sec6 {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  background-color: white;
+  padding: 0 20px;
+}
+
+.partners {
+  display: flex;
+  justify-content: center;
+  gap: 250px;
+}
+
+.partners img {
+  max-width: 150px;
+  height: auto;
+}
+
+/* AstraTech Info Section */
+.sec4 {
+  background-image: url('../src//assets/GedungAstra.png');
+  background-size: cover; /* Ensures the image covers the entire section */
+  background-position: center center; /* Ensures the image is centered */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  width: 100%; /* Full width of the section */
+  height: 150vh; /* Adjusted height */
+  color: white;
+  text-align: center;
+  padding: 60px 20px; /* Adjust padding for mobile responsiveness */
+}
+
+.sec4 h4 {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.sec4 p {
+  font-size: 1rem;
+  margin: 10px 0;
+}
+
+.sec4 button {
+  background-color: #005BAA;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+
+/*------------------------------------------*/
+/* Hero Section - Responsif */
+@media (max-width: 1024px) {
+  .sec1 {
+  margin-top: 80px;
+  }
+
+  .ucapan h3 {
+    font-size: 1.5rem;
+    margin-top: 20px;
+  }
+  
+  .ucapan h1 {
+      
+      font-size: 2.5rem;
+  }
+
+  .ucapan p {
+      font-size: 1.2rem;
+  }
+
+  .ucapan button {
+      width: 90%;
+      max-width: 300px;
+  }
+
+  .imgDatang {
+      margin-top: 20px;
+      
+  }
+}
+
+
+/* Media Queries for mobile responsiveness */
+@media (max-width: 768px) {
+  .sec1 {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: auto;
+  }
+
+  .ucapan {
+      width: 100%;
+      text-align: center;
+  }
+
+  .ucapan h3 {
+    font-size: 1.3rem;
+   
+  }
+  .ucapan h1 {
+      margin-top: 0;
+      font-size: 2rem;
+  }
+
+  .ucapan p {
+      font-size: 1rem;
+  }
+
+  .ucapan button {
+      width: 100%;
+  }
+
+  .imgDatang {
+      max-width: 100%;
+  }
+
+
+
+  .sec4 {
+      padding: 40px 20px;
+      
+  }
+
+  .sec4 h4 {
+      font-size: 1.25rem;
+  }
+
+  .sec4 p {
+      font-size: 0.9rem;
+      margin: 10px 0;
+  }
+}
+
+/* Partner Logos Section - Responsif */
+@media (max-width: 1024px) {
+  .partners {
+      gap: 150px;
+  }
+
+  .partners img {
+      max-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .partners {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+  }
+
+  .partners img {
+      max-width: 400px;
+  }
+}
+
+/* AstraTech Section */
+@media (max-width: 1024px) {
+  .sec4 {
+      width: 100%;
+      padding: 50px 20px;
+  }
+
+  .sec4 h4 {
+      font-size: 1.5rem;
+  }
+
+  .sec4 p {
+      font-size: 1rem;
+  }
+
+  .sec4 button {
+      padding: 10px 15px;
+  }
+}
+
+
 
 
 /* Base Footer Styles */

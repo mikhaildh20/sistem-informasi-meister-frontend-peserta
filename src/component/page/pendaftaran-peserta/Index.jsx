@@ -1,5 +1,4 @@
 import "chart.js/auto";
-import "../../../Beranda.css";
 import mahasiswa from "../../../assets/mahasiswa.png";
 import KampusMerdeka from "../../../assets/KampusMerdeka.png";
 import SatuMerdeka from "../../../assets/SatuMerdeka.png";
@@ -12,9 +11,10 @@ export default function BerandaIndex({onChangePage}) {
         {/* Hero Section */}
         <section className="sec1">
             <div className="ucapan">
-            <h1>Tingkatkan Kompetensimu dengan Program Meister</h1>
+            <h3>ASTRA BACHELOR PROFESSIONAL</h3>
+            <h1>AUTOMOTIVE MECHATRONIC PROGRAM</h1>
             <p>
-                Dapatkan sertifikasi German Bachelor Professional (Meister) bidang otomotif. Daftar sekarang dan raih sertifikasi internasional pertama di Asia!
+            Mampu mengembangkan produk dan layanan jasa, mengelola karyawan, berperan sebagai penanggung jawab, serta mendorong kemajuan perusahaan.
             </p>
             <button onClick={() => onChangePage("add")}>Daftar Sekarang</button>
             </div>
