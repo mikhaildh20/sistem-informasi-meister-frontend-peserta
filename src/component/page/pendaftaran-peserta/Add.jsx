@@ -389,28 +389,33 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                     throw new Error("Gagal mendaftar. Silakan coba lagi.");
                 }
 
-                const idPeserta = data[0].Response; 
-                let isSertifikatSuccess = true;
-                let sertifikatResponses = [];
+                const idPeserta = data[0].Response;
+                const uploadTasks = [];
 
                 if (formDataRef.current["fileSertifikat"]) {
                     const sertifikatArray = formDataRef.current["fileSertifikat"].split(",");
-
-                    sertifikatResponses = await Promise.all(
-                        sertifikatArray.map(async (fileName) => {
-                            const response = await UseFetch(
-                                API_LINK + "PendaftaranPeserta/CreateDetailSertifikat",
-                                { fileName, idPeserta }
-                            );
-                            return response;
-                        })
+                    uploadTasks.push(
+                        ...sertifikatArray.map(fileName => 
+                            UseFetch(API_LINK + "PendaftaranPeserta/CreateDetailSertifikat", { fileName, idPeserta })
+                        )
                     );
-
-                    isSertifikatSuccess = sertifikatResponses.every(res => res && res[0].Response !== "ERROR");
                 }
 
-                if (!isSertifikatSuccess) {
-                    throw new Error("Beberapa sertifikat gagal disimpan.");
+                uploadTasks.push(
+                    ...records.map(record => 
+                        UseFetch(API_LINK + "PendaftaranPeserta/CreateDetailPekerjaan", {
+                            id: idPeserta,
+                            namaPerusahaan: record.perusahaan,
+                            jabatan: record.jabatan,
+                            periodeKerja: record.periode
+                        })
+                    )
+                );
+
+                const responses = await Promise.all(uploadTasks);
+
+                if (responses.some(res => !res || res[0].Response === "ERROR")) {
+                    throw new Error("Beberapa data gagal disimpan.");
                 }
 
                 SweetAlert("Sukses", "Berhasil mendaftar!", "success");
@@ -982,7 +987,7 @@ export default function PendaftaranPesertaMeisterAdd({onChangePage}){
                             </div>
                             <div className="card-body">
 
-                            <label className="form-label fw-bold">Scan Sertifikat (.pdf, .jpg, .png)</label>
+                            <label className="form-label fw-bold">Scan Sertifikat (.pdf, .jpg, .png) <span className="text-danger">*</span></label>
                                 <table className="table table-bordered table-striped text-center">
                                     <thead>
                                         <tr>
