@@ -1,5 +1,4 @@
-import { useEffect, useState, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useState } from "react";
 
 import Navbar from "./component/backbone/Header";
 import Footer from "./component/backbone/Footer";

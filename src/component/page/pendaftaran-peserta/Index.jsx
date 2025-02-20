@@ -8,7 +8,6 @@ export default function BerandaIndex({onChangePage}) {
 
     return (
         <div className="meister-container">
-        {/* Hero Section */}
         <section className="sec1">
             <div className="ucapan">
             <h3>ASTRA BACHELOR PROFESSIONAL</h3>
@@ -23,7 +22,6 @@ export default function BerandaIndex({onChangePage}) {
             </div>
         </section>
 
-        {/* Partner Logos Section */}
         <section className="sec6">
             <div className="partners">
             <img className="ASTRAtech" src={ASTRAtech} alt="Logo AstraTech" />
@@ -32,7 +30,6 @@ export default function BerandaIndex({onChangePage}) {
             </div>
         </section>
 
-        {/* AstraTech Information Section */}
         <section className="sec4">
             <h4>Ingin tahu lebih banyak tentang ASTRAtech?</h4>
             <p>

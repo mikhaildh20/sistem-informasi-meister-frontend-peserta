@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import { API_LINK } from "./Constants";
 
 const UploadFile = async (fileInput, type = "single", folder = "Uploads") => {
@@ -29,7 +28,6 @@ const UploadFile = async (fileInput, type = "single", folder = "Uploads") => {
         }
     }
 
-    // Untuk single upload
     if (fileInput.files.length === 0) return "ERROR";
 
     data.append("file", fileInput.files[0]);
