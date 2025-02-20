@@ -1,6 +1,15 @@
 import logo from "../../assets/IMG_Logo.png";
+import { useEffect, useState, Suspense } from "react";
 
-const Header = () => {
+const Header = ({setToggleButton}) => {
+  const [inputValue, setInputValue] = useState(""); 
+  const [isHidden, setIsHidden] = useState(false);
+
+  const handleDaftarClick = () => {
+    setToggleButton("add");
+    setIsHidden(true);
+  };
+  
   return (
     <div>
       <nav>
@@ -27,7 +36,7 @@ const Header = () => {
                 borderRadius: "12px",
                 transition: "background-color 0.3s",
               }}
-              onClick={() => navigate("/daftar")}
+              onClick={handleDaftarClick}
             >
               Daftar
             </button>
