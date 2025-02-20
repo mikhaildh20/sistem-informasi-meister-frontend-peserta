@@ -1,21 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PendaftaranPesertaMeisterIndex from "./Index";
 import PendaftaranPesertaMeisterAdd from "./Add";
 
-export default function PendaftaranPesertaMeister() {
-    const [pageMode, setPageMode] = useState("index");
+export default function PendaftaranPesertaMeister({
+    pageMode,
+    setPageMode,
+    handleToggleButton,
+    }) {
+    useEffect(() => {
+        if (pageMode === "index") {
+        handleToggleButton(true); 
+        } else if (pageMode === "add") {
+        handleToggleButton(false); 
+        }
+    }, [pageMode, handleToggleButton]);
 
     function getPageMode() {
         switch (pageMode) {
         case "index":
-            return <PendaftaranPesertaMeisterIndex onChangePage={handleSetPageMode} />;
+            return <PendaftaranPesertaMeisterIndex onChangePage={setPageMode} />;
         case "add":
-            return <PendaftaranPesertaMeisterAdd onChangePage={handleSetPageMode} />;
+            return <PendaftaranPesertaMeisterAdd onChangePage={setPageMode} />;
+        default:
+            return null;
         }
-    }
-
-    function handleSetPageMode(mode) {
-        setPageMode(mode);
     }
 
     return <div>{getPageMode()}</div>;
